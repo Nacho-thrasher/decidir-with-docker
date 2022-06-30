@@ -1,0 +1,2 @@
+# Microservicio Gestión de Personas (SCH_CENTRAL)
+`docker run --rm -it --name ucs-micro-personas-central-v1 -v /home/missbird/Apps/UCASAL/ucs-micro-personas-central:/app --network=ucs-micros-network -p 5001:8080  -e "DB_USUARIO=SCH_CENTRAL" -e "DB_CLAVE=SCH_CENTRAL" -e "RUN_WITH=node" express-oracle-api:v1`
