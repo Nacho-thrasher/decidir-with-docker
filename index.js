@@ -21,9 +21,8 @@ try {
     process.exit(1);
   }
 
-//------ instancio la app express ------
+// ------ instancio la app express ------
 const app = express()
-
 app.use(express.json())
 
 //------ inicializaciones/configuraciones varias ------
