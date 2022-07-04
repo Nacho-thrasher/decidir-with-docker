@@ -52,5 +52,4 @@ class GesDecidirLog {
     //? metodo save guardar un objeto con los datos del modelo
     
 }
-
 module.exports = { GesDecidirLog };

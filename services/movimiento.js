@@ -4,14 +4,13 @@ const { getMarcaReinscripcionFicha, devolverMaestro } = require('../services/mer
 const getByNroTran = async(nroTran) => {
     try {
         //? tmb consultar a ges-decidir para ver si el movimiento existe
-
         let q = `SELECT * FROM GES_MOVIMS_COD_BARRA2 
                 WHERE NRO_TRANSAC = ${nroTran}`;
         
         const result = await consulta(q);
-        console.log('soy result:', result);
         if (result.length == 0) return null;
         if (result == null) return null;
+        
         return result;
         
     } catch (error) {

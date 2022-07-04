@@ -3,7 +3,6 @@ const { getBoletaById } = require('../services/boleta');
 const getBoleta = async(req, res) => {
     let { nroTran } = req.query;
     try { 
-        //? resolve nro transac float
         const movim = await getBoletaById(nroTran);
         if (!movim) {
             return res.status(404).json({

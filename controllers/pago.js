@@ -28,11 +28,11 @@ const getStatusPago = async(req, res) => {
 }
 const ejecutarPago = async(req, res) => {
     const { nroTran, appOrigen } = req.query;
-    const { movim, cuota, medioPago } = req;
+    const { movim, cuota, medioPago, PaymentRequestDto } = req;
     try { //! paymentReq modelo de datos de pago
         //? ges decidir log es add, va agregando los movimientos
         const floatAmount = getAmount(movim);
-        if (floatAmount == null) {
+        if (floatAmount == null || floatAmount.length == 0) {
             const error = 'No es posible ejecutar el pago debido a que no se pudo obtener el monto asociado a la transacción.'
             req.decidirLog.error = error;
             editLog(req.decidirLog);
@@ -52,7 +52,7 @@ const ejecutarPago = async(req, res) => {
         req.decidirLog.montoPorCuota = montoPorCuota;
         req.decidirLog = editLog(req.decidirLog);
         
-        const paymentResponse = await postPagoDecidir(req.body, movim, longAmount, cuota.CANTIDAD, medioPago.SITE_ID);       
+        const paymentResponse = await postPagoDecidir(PaymentRequestDto, movim, longAmount, cuota.CANTIDAD, medioPago.SITE_ID);       
         if (!paymentResponse || paymentResponse.length === 0) {
             const error = 'Falló el proceso ejecutarPago (Decidir).'
             req.decidirLog.error = error;
@@ -74,7 +74,7 @@ const ejecutarPago = async(req, res) => {
                 nroTran: nroTran,
             }
             //? insertar en ges decidir log el pago
-            const gesDecidir = await addGesDecidir(nroTran, req.body, floatAmount, movim, paymentResponse, cuota, appOrigen );
+            const gesDecidir = await addGesDecidir(nroTran, PaymentRequestDto, floatAmount, movim, paymentResponse, cuota, appOrigen );
             if (!gesDecidir) {
                 return res.status(404).json({
                     message: `Fallo insertando en GES_DECIDIR el pago`
@@ -86,8 +86,26 @@ const ejecutarPago = async(req, res) => {
             });
         }
         //? caso rejected
-        
+        else{
+            let paymentErrorMessage = `Mensaje de error no controlado: ${statusPayment}`
+            if (statusPayment === "rejected") {
+                //? salto de linea
+                paymentErrorMessage =  `Pago rechazado (${statusPayment}). Detalle del error: \n
+                Tipo: ${paymentResponse.status_details.error.type} \n
+                Id: ${paymentResponse.status_details.error.reason.id} \n
+                Descripción: ${paymentResponse.status_details.error.reason.description} \n
+                Descripción adicional: ${paymentResponse.status_details.error.reason.additional_description} \n
+                Ticket: ${paymentResponse.status_details.ticket} \n
+                Codigo de autorización de la tarjeta: ${paymentResponse.status_details.card_authorization_code} \n
+                Código de validación de dirección: ${paymentResponse.status_details.address_validation_code} \n
+                `;
+                return res.status(404).json({
+                    message: paymentErrorMessage
+                });
 
+            }
+        }
+        
     } 
     catch (error) {
         console.log(error);

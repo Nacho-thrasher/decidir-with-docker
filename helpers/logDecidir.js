@@ -24,6 +24,7 @@ const editLog = (args) => {
     if (args == null) return null
     args.fechaActualizacion = new Date()
     return args
+    //?! servicio de insert en ges decidir log
 }
 
 module.exports = { addLog, editLog };
