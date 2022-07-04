@@ -2,6 +2,7 @@
 const axios = require('axios');
 const decidirUrl = `https://developers.decidir.com/api/v2/`
 const decidirPrivateKey = `1b19bb47507c4a259ca22c12f78e881f`
+const { consulta } = require('../index');
 // const decidirPublicKey = `96e7f0d36a0648fb9a8dcb50ac06d260`
 const getPagoDecidir = async(siteTransactionId) => {
     if (siteTransactionId == null || siteTransactionId.length == 0) {
@@ -60,4 +61,44 @@ const postPagoDecidir = async(paymentRequest, movim, amount, cuotas, siteId) => 
     }
 }
 
-module.exports = { getPagoDecidir, postPagoDecidir };
+const insertGesDecidir = async(args) => {
+
+    let q = `INSERT INTO GES_DECIDIR 
+    ( DESCRIPCION, 
+    HABER, 
+    COMISION, 
+    MONTO_RECIBIDO, 
+    NRO_TRANSAC, 
+    TIPO_OPERACION, 
+    ID_MEDIO_PAGO, 
+    BIN, 
+    ID_DECIDIR, 
+    TICKET, 
+    CANT_CUOTAS,
+    INTERES, 
+    MONTO_CON_INTERES,
+    MONTO_X_CUOTA, 
+    APP_ORIGEN)
+    VALUES ('${args.descripcion}'
+        ,${args.haber}
+        ,${args.comision}
+        ,${args.montoRecibido}
+        ,'${args.nroTransac}'
+        ,'${args.tipoOperacion}'
+        ,${args.idMedioPago}
+        ,'${args.bin}'
+        ,'${args.idDecidir}'
+        ,'${args.ticket}'
+        ,${args.cantCuotas}
+        ,${args.interes}
+        ,${args.montoConInteres}
+        ,${args.montoPorCuota}
+        ,'${args.appOrigen}'
+    )`;
+    console.log(q);
+    const result = await consulta(q);
+    return result;
+
+}
+
+module.exports = { getPagoDecidir, postPagoDecidir, insertGesDecidir};

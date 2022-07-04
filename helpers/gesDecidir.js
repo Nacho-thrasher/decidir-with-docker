@@ -1,6 +1,7 @@
 const crypto = require('crypto');
 const { calcularMontoConInteres, calcularMontoPorCuota } = require('../helpers/cuota');
 const { getDescription } = require('../services/movimiento');
+const { insertGesDecidir } = require('../services/decidir');
 
 const addGesDecidir = async(nroTran, paymentReq, amount, movim, paymentResp, cuota, appOrigen) => {
     if (nroTran == null || paymentReq == null || amount == null ||  movim == null || cuota == null) {
@@ -24,6 +25,9 @@ const addGesDecidir = async(nroTran, paymentReq, amount, movim, paymentResp, cuo
         montoPorCuota: calcularMontoPorCuota(amount, cuota.CANTIDAD, cuota.INTERES),
         appOrigen: appOrigen == null || appOrigen.length == 0 ? 'SAG_BACKEND' : appOrigen,
     }
+    //? insert en ges decidir
+    const gesDecidir = await insertGesDecidir(args);
+    console.log('gesDecidir insert', gesDecidir);
     return args
 
 }
