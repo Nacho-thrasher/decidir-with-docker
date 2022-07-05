@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const { getStatusPago, ejecutarPago } = require('../controllers/pago');
+const { getStatusPago, ejecutarPago, pagoPruebaDecidir } = require('../controllers/pago');
 const { validarMovims } = require('../middlewares/validarMovims');
 const { validarMedioPago } = require('../middlewares/validarMedioPago');
 const { validarCuotas } = require('../middlewares/validarCuotas');
@@ -17,5 +17,8 @@ router.post('/',
     ],
     ejecutarPago
 );
+router.post('/decidir',
+    pagoPruebaDecidir
+)
 
 module.exports = router;

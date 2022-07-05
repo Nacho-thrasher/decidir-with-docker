@@ -11,7 +11,7 @@ const getByNroTran = async(nroTran) => {
         if (result.length == 0) return null;
         if (result == null) return null;
         
-        return result;
+        return result[0];
         
     } catch (error) {
         console.log(error);
@@ -25,15 +25,18 @@ const getDescription = async(movim) => {
     const marcaReinscripcionFicha = await getMarcaReinscripcionFicha(movim.TDOCU, movim.NDOCU, movim.LUGAR, movim.SECTOR, movim.CARRERA, movim.MODO);
     if (marcaReinscripcionFicha != null) {
         modalidad = marcaReinscripcionFicha
+        console.log('marcaReinscripcionFicha aqui', marcaReinscripcionFicha);
     }
     else{
         const maestro = await devolverMaestro(movim.TDOCU, movim.NDOCU, movim.LUGAR, movim.SECTOR, movim.CARRERA, movim.MODO);
         if (maestro != null) {
+            console.log('maestro aqui', maestro);
             if (maestro.MARCA_INS != null) {
                 modalidad = maestro.MARCA_INS
             }    
         }
     }
+    console.log('modalidad', modalidad);
     //? descripcion del movimiento append pago sag 
     let descripcion =  `PAGO SAG - ${modalidad} - ${movim.LUGAR} - ${movim.SECTOR} - ${movim.CARRERA} - ${movim.MODO}
     - ${movim.TDOCU} - ${movim.NDOCU} - ${movim.NRO_COMP1} - ${movim.NRO_COMP2}`;

@@ -2,6 +2,7 @@
 const getAmount = (movim) => {
     
     let floatAmount = movim.TOTAL2 //? parsear luego a float
+    console.log('aqui: ', movim.TOTAL2);
     const fechaHoy = getZeroTimeDate(new Date());
     try {
         //ver el campo fvto1 y fvto2 . Si la fecha actual es menor o igual a fvto1 tomar 1 sino tomar 2
@@ -24,6 +25,7 @@ const getZeroTimeDate = (date) => {
 const parseAmountToLong = (floatAmount) => {
     //? decimal format to "0.00"
     const longAmount = parseFloat(floatAmount).toFixed(2).replace('.', '');
+    console.log('longAmount', longAmount);
     return longAmount;
 }
 

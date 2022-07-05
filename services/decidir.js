@@ -1,3 +1,4 @@
+// http://www-desa.ucasal.edu.ar/inscripciones/
 // const { DECIDIR_URL, DECIDIR_PRIVATE_KEY } = process.env;
 const axios = require('axios');
 const decidirUrl = `https://developers.decidir.com/api/v2/`
@@ -29,34 +30,36 @@ const getPagoDecidir = async(siteTransactionId) => {
 }
 const postPagoDecidir = async(paymentRequest, movim, amount, cuotas, siteId) => {
     if (paymentRequest == null || movim == null) return null;     
-    //? con los datos del usuario se genero el pago
-    console.log('llego a postPagoDecidir'); //? token es transaction_id
+    // console.log('llego a postPagoDecidir ', 'movim.NRO_TRANSAC'); //? token es transaction_id
+    console.log('llego a postPagoDecidir ', siteId); 
     try {
         const args = {
             "establishment_name": "UCASAL",
             "token": paymentRequest.token,
-            "site_transaction_id": movim.NRO_TRANSAC,
+            "site_transaction_id": (movim.NRO_TRANSAC).toString(),
+            // "site_id": (siteId).toString(), 
             "payment_method_id": paymentRequest.paymentMethodId,
-            "site_id": siteId, 
             "bin": paymentRequest.bin,
-            "amount": amount,
+            "amount": Number(amount),
             "currency": "ARS",
             "installments": cuotas,
             "payment_type": "single",
             "sub_payments": [] //? consultar aqui
         }
         //? se crea el pago en decidir
-        const pago = await axios.post(`${decidirUrl}payments`, args, {
+        const pago = await axios.post(`${decidirUrl}payments`, 
+        args, {
             headers: {
                 'Content-Type': 'application/json',
                 'apikey': decidirPrivateKey,
-                'Cache-Control': 'no-cache'
+                'cache-control': 'no-cache',
             }
         })
-        return pago.data;
+        // console.log('aqui decidir: ',pago.data);
+        return await pago.data;
 
     } catch (error) {
-        console.log(error);
+        console.log(error.response.data);
         return null;
     }
 }
@@ -64,41 +67,31 @@ const postPagoDecidir = async(paymentRequest, movim, amount, cuotas, siteId) => 
 const insertGesDecidir = async(args) => {
 
     let q = `INSERT INTO GES_DECIDIR 
-    ( DESCRIPCION, 
-    HABER, 
-    COMISION, 
-    MONTO_RECIBIDO, 
-    NRO_TRANSAC, 
-    TIPO_OPERACION, 
-    ID_MEDIO_PAGO, 
-    BIN, 
-    ID_DECIDIR, 
-    TICKET, 
-    CANT_CUOTAS,
-    INTERES, 
-    MONTO_CON_INTERES,
-    MONTO_X_CUOTA, 
-    APP_ORIGEN)
-    VALUES ('${args.descripcion}'
-        ,${args.haber}
-        ,${args.comision}
-        ,${args.montoRecibido}
-        ,'${args.nroTransac}'
-        ,'${args.tipoOperacion}'
-        ,${args.idMedioPago}
-        ,'${args.bin}'
-        ,'${args.idDecidir}'
-        ,'${args.ticket}'
-        ,${args.cantCuotas}
-        ,${args.interes}
-        ,${args.montoConInteres}
-        ,${args.montoPorCuota}
-        ,'${args.appOrigen}'
-    )`;
-    console.log(q);
+    (FEC_MOV, DESCRIPCION, HABER, COMISION, MONTO_RECIBIDO, NRO_TRANSAC, ID_MEDIO_PAGO, BIN, ID_DECIDIR, TICKET, CANT_CUOTAS,INTERES, MONTO_CON_INTERES, MONTO_X_CUOTA, APP_ORIGEN) 
+    VALUES (TO_DATE('${args.fecMov}', 'yyyy/mm/dd hh24:mi:ss'), '${args.descripcion}', ${parseInt(args.haber)}, ${parseInt(args.comision)}, ${parseInt(args.montoRecibido)}, ${parseInt(args.nroTransac)}, ${parseInt(args.idMedioPago)}, '${args.bin}', ${parseInt(args.idDecidir)}, '${args.ticket}', ${parseInt(args.cantCuotas)}, ${parseInt(args.interes)}, ${parseInt(args.montoConInteres)}, ${parseInt(args.montoPorCuota)}, '${args.appOrigen}')`;
+    
+    console.log({
+        FEC_MOV: args.fecMov,
+        descripcion: args.descripcion,
+        haber: args.haber,
+        comision: args.comision,
+        montoRecibido: args.montoRecibido,
+        nroTransac: args.nroTransac,
+        idMedioPago: args.idMedioPago,
+        bin: args.bin,
+        idDecidir: args.idDecidir,
+        ticket: args.ticket,
+        cantCuotas: args.cantCuotas,
+        interes: args.interes,
+        montoConInteres: args.montoConInteres,
+        montoPorCuota: args.montoPorCuota,
+        appOrigen: args.appOrigen
+    });
+    
     const result = await consulta(q);
     return result;
 
 }
 
 module.exports = { getPagoDecidir, postPagoDecidir, insertGesDecidir};
+//! PENDIENTE NRO COMP1 ETC

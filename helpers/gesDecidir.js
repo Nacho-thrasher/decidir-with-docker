@@ -9,6 +9,8 @@ const addGesDecidir = async(nroTran, paymentReq, amount, movim, paymentResp, cuo
     }    
     const descripcion = await getDescription(movim);
     const args = {
+        //? new date to yyyy/mm/dd hh:mi:ss
+        fecMov: new Date().toISOString().substring(0, 10) + ' ' + new Date().toISOString().substring(11, 19),
         gesDecidirId: crypto.randomUUID(),
         descripcion: descripcion,
         haber: amount,
@@ -25,6 +27,8 @@ const addGesDecidir = async(nroTran, paymentReq, amount, movim, paymentResp, cuo
         montoPorCuota: calcularMontoPorCuota(amount, cuota.CANTIDAD, cuota.INTERES),
         appOrigen: appOrigen == null || appOrigen.length == 0 ? 'SAG_BACKEND' : appOrigen,
     }
+
+    console.log('addGesDecidir: ', args);
     //? insert en ges decidir
     const gesDecidir = await insertGesDecidir(args);
     console.log('gesDecidir insert', gesDecidir);
