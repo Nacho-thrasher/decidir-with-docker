@@ -16,6 +16,8 @@ const addGesDecidir = async(nroTran, paymentReq, amount, movim, paymentResp, cuo
         haber: amount,
         comision: 0,
         montoRecibido: amount,
+        nroComp1: movim.NRO_COMP1,
+        nroComp2: movim.NRO_COMP2,
         nroTransac: nroTran,
         idMedioPago: paymentReq.paymentMethodId,
         bin: paymentReq.bin,

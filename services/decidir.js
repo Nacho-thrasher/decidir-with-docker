@@ -67,8 +67,8 @@ const postPagoDecidir = async(paymentRequest, movim, amount, cuotas, siteId) => 
 const insertGesDecidir = async(args) => {
 
     let q = `INSERT INTO GES_DECIDIR 
-    (FEC_MOV, DESCRIPCION, HABER, COMISION, MONTO_RECIBIDO, NRO_TRANSAC, ID_MEDIO_PAGO, BIN, ID_DECIDIR, TICKET, CANT_CUOTAS,INTERES, MONTO_CON_INTERES, MONTO_X_CUOTA, APP_ORIGEN) 
-    VALUES (TO_DATE('${args.fecMov}', 'yyyy/mm/dd hh24:mi:ss'), '${args.descripcion}', ${parseInt(args.haber)}, ${parseInt(args.comision)}, ${parseInt(args.montoRecibido)}, ${parseInt(args.nroTransac)}, ${parseInt(args.idMedioPago)}, '${args.bin}', ${parseInt(args.idDecidir)}, '${args.ticket}', ${parseInt(args.cantCuotas)}, ${parseInt(args.interes)}, ${parseInt(args.montoConInteres)}, ${parseInt(args.montoPorCuota)}, '${args.appOrigen}')`;
+    (FEC_MOV, DESCRIPCION, HABER, COMISION, MONTO_RECIBIDO, NRO_COMP1, NRO_COMP2, NRO_TRANSAC, ID_MEDIO_PAGO, BIN, ID_DECIDIR, TICKET, CANT_CUOTAS,INTERES, MONTO_CON_INTERES, MONTO_X_CUOTA, APP_ORIGEN) 
+    VALUES (TO_DATE('${args.fecMov}', 'yyyy/mm/dd hh24:mi:ss'), '${args.descripcion}', ${parseInt(args.haber)}, ${parseInt(args.comision)}, ${parseInt(args.montoRecibido)}, ${parseInt(args.nroComp1)}, ${parseInt(args.nroComp2)}, ${parseInt(args.nroTransac)}, ${parseInt(args.idMedioPago)}, '${args.bin}', ${parseInt(args.idDecidir)}, '${args.ticket}', ${parseInt(args.cantCuotas)}, ${parseInt(args.interes)}, ${parseInt(args.montoConInteres)}, ${parseInt(args.montoPorCuota)}, '${args.appOrigen}')`;
     
     console.log({
         FEC_MOV: args.fecMov,
@@ -76,6 +76,8 @@ const insertGesDecidir = async(args) => {
         haber: args.haber,
         comision: args.comision,
         montoRecibido: args.montoRecibido,
+        nroComp1: args.nroComp1,
+        nroComp2: args.nroComp2,
         nroTransac: args.nroTransac,
         idMedioPago: args.idMedioPago,
         bin: args.bin,
