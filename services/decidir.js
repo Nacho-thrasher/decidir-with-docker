@@ -55,21 +55,17 @@ const postPagoDecidir = async(paymentRequest, movim, amount, cuotas, siteId) => 
 
     } catch (error) {
         console.log(error.response.data);
+        //? ya se realizo el pago en decidir //? cambiar esto
+        if (error.response.data.hasOwnProperty('validation_errors')) {
+            if (error.response.data.validation_errors[0].hasOwnProperty('code')) {
+                const code = error.response.data.validation_errors[0].code;
+                console.log(code);
+                return code == 'repeated' ? { error: 'Ya se realizo un pago con este id_transaction' } : { error: error.response.data };
+            }
+        }          
         return null;
     }
 }
-
-const insertGesDecidir = async(args) => {
-
-    let q = `INSERT INTO GES_DECIDIR 
-    (FEC_MOV, DESCRIPCION, HABER, COMISION, MONTO_RECIBIDO, NRO_COMP1, NRO_COMP2, NRO_OPERACION, NRO_TRANSAC, ID_MEDIO_PAGO, BIN, ID_DECIDIR, TICKET, CANT_CUOTAS,INTERES, MONTO_CON_INTERES, MONTO_X_CUOTA, APP_ORIGEN) 
-    VALUES (TO_DATE('${args.fecMov}', 'yyyy/mm/dd hh24:mi:ss'), '${args.descripcion}', ${parseInt(args.haber)}, ${parseInt(args.comision)}, ${parseInt(args.montoRecibido)}, ${parseInt(args.nroComp1)}, ${parseInt(args.nroComp2)}, ${parseInt(args.idDecidir)}, ${parseInt(args.nroTransac)}, ${parseInt(args.idMedioPago)}, '${args.bin}', ${parseInt(args.idDecidir)}, '${args.ticket}', ${parseInt(args.cantCuotas)}, ${parseInt(args.interes)}, ${parseInt(args.montoConInteres)}, ${parseInt(args.montoPorCuota)}, '${args.appOrigen}')`;
-    
-    const result = await consulta(q);
-    return result;
-
-}
-
 const obtenerUnPago = async(idDecidir) => {
     if (idDecidir == null || idDecidir.length == 0) return null;     
     try {
@@ -90,5 +86,26 @@ const obtenerUnPago = async(idDecidir) => {
         return null;
     }
 }
+const insertGesDecidir = async(args) => {
 
-module.exports = { getPagoDecidir, postPagoDecidir, insertGesDecidir, obtenerUnPago};
+    let q = `INSERT INTO GES_DECIDIR 
+    (FEC_MOV, DESCRIPCION, HABER, COMISION, MONTO_RECIBIDO, NRO_COMP1, NRO_COMP2, NRO_OPERACION, NRO_TRANSAC, ID_MEDIO_PAGO, BIN, ID_DECIDIR, TICKET, CANT_CUOTAS,INTERES, MONTO_CON_INTERES, MONTO_X_CUOTA, APP_ORIGEN) 
+    VALUES (TO_DATE('${args.fecMov}', 'yyyy/mm/dd hh24:mi:ss'), '${args.descripcion}', ${parseInt(args.haber)}, ${parseInt(args.comision)}, ${parseInt(args.montoRecibido)}, ${parseInt(args.nroComp1)}, ${parseInt(args.nroComp2)}, ${parseInt(args.idDecidir)}, ${parseInt(args.nroTransac)}, ${parseInt(args.idMedioPago)}, '${args.bin}', ${parseInt(args.idDecidir)}, '${args.ticket}', ${parseInt(args.cantCuotas)}, ${parseInt(args.interes)}, ${parseInt(args.montoConInteres)}, ${parseInt(args.montoPorCuota)}, '${args.appOrigen}')`;
+    
+    const result = await consulta(q);
+    return result;
+
+}
+const insertGesDecidirLog = async(args) => {
+
+    let q = `INSERT INTO GES_DECIDIR_LOG
+    (ID, FECHA_CREACION, FECHA_ACTUALIZACION, ID_MEDIO_PAGO, BIN, MONTO, CANT_CUOTAS, INTERES, MONTO_CON_INTERES, MONTO_X_CUOTA, STATUS, ERROR, NRO_TRANSAC, APP_ORIGEN)
+    VALUES ('${args.gesDecidirLogId}', TO_DATE('${args.fechaCreacion}', 'yyyy/mm/dd hh24:mi:ss'), TO_DATE('${args.fechaActualizacion}', 'yyyy/mm/dd hh24:mi:ss'), ${parseInt(args.idMedioPago)}, '${args.bin}', ${parseInt(args.monto)}, ${parseInt(args.cantCuotas)}, ${parseInt(args.interes)}, ${parseInt(args.montoConInteres)}, ${parseInt(args.montoPorCuota)}, '${args.status}', '${args.error}', ${parseInt(args.nroTran)}, '${args.appOrigen}')`;
+    
+    const result = await consulta(q);
+    return result;
+
+}
+
+
+module.exports = { getPagoDecidir, postPagoDecidir, insertGesDecidir, obtenerUnPago, insertGesDecidirLog};

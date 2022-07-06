@@ -8,7 +8,7 @@ const validarMedioPago = async(req, res, next) => {
         if (!medioPago || medioPago == undefined) {
             const error = 'No existe el medio de pago ingresado.'
             req.decidirLog.error = error;
-            editLog(req.decidirLog);
+            await editLog(req.decidirLog);
             return res.status(404).json({
                 message: error 
             });

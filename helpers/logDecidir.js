@@ -1,11 +1,12 @@
 const crypto = require('crypto');
+const { insertGesDecidirLog } = require('../services/decidir');
 
 const addLog = (nroTran, paymentReq, appOrigen) => {
     if (nroTran == null || paymentReq == null ) return null   
     const args = {
         'gesDecidirLogId': crypto.randomUUID(),
-        'fechaCreacion': new Date(),
-        'fechaActualizacion': new Date(),
+        'fechaCreacion': new Date().toISOString().substring(0, 10) + ' ' + new Date().toISOString().substring(11, 19),
+        'fechaActualizacion': new Date().toISOString().substring(0, 10) + ' ' + new Date().toISOString().substring(11, 19),
         'idMedioPago': paymentReq.paymentMethodId,
         'bin': paymentReq.bin,
         'monto': null,
@@ -20,11 +21,14 @@ const addLog = (nroTran, paymentReq, appOrigen) => {
     }
     return args
 }
-const editLog = (args) => {
+const editLog = async(args) => {
     if (args == null) return null
-    args.fechaActualizacion = new Date()
+    args.fechaActualizacion = new Date().toISOString().substring(0, 10) + ' ' + new Date().toISOString().substring(11, 19);
+    console.log('editLog', args);
+    const response = await insertGesDecidirLog(args);
+    console.log('response: ',response);
+    
     return args
-    //?! servicio de insert en ges decidir log
 }
 
 module.exports = { addLog, editLog };

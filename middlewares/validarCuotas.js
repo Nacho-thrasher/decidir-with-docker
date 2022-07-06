@@ -8,7 +8,7 @@ const validarCuotas = async(req, res, next) => {
         if (!cuota || cuota == undefined) {
             const error = 'No existe la cuota correspondiente al ID ingresado.'
             req.decidirLog.error = error;
-            editLog(req.decidirLog);
+            await editLog(req.decidirLog);
             return res.status(404).json({
                 message: error
             });

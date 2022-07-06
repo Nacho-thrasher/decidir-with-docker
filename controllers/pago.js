@@ -35,7 +35,7 @@ const ejecutarPago = async(req, res) => {
         if (floatAmount == null) {
             const error = 'No es posible ejecutar el pago debido a que no se pudo obtener el monto asociado a la transacción.'
             req.decidirLog.error = error;
-            editLog(req.decidirLog);
+            await editLog(req.decidirLog);
             return res.status(404).json({
                 message: error
             });
@@ -49,16 +49,17 @@ const ejecutarPago = async(req, res) => {
         req.decidirLog.interes = cuota.INTERES;
         req.decidirLog.montoConInteres = montoConInteres;
         req.decidirLog.montoPorCuota = montoPorCuota;
-        req.decidirLog = editLog(req.decidirLog);
+        // req.decidirLog = await editLog(req.decidirLog);
         //* Creo el pago en decidir
         const paymentResponse = await postPagoDecidir(PaymentRequestDto, movim, longAmount, cuota.CANTIDAD, medioPago.SITE_ID);       
-        if (!paymentResponse || paymentResponse == null) {
+        if (!paymentResponse || paymentResponse == null || paymentResponse.error != null) {
             const error = 'Falló el proceso ejecutarPago (Decidir).'
             req.decidirLog.error = error;
             req.decidirLog.status = 'ERROR_EJECUTAR_PAGO_API_DECIDIR';
-            editLog(req.decidirLog);
+            await editLog(req.decidirLog);
             return res.status(404).json({
-                message: error
+                message: error,
+                type: paymentResponse.error
             });
         }
         const statusPayment = paymentResponse.status;
@@ -66,7 +67,7 @@ const ejecutarPago = async(req, res) => {
         if (statusPayment === "approved") {
             //? agrego en ges decidir_log el pago  
             req.decidirLog.status = statusPayment;
-            editLog(req.decidirLog);
+            await editLog(req.decidirLog);
             //? payment response
             const args = {
                 id: paymentResponse.id,
@@ -114,7 +115,6 @@ const ejecutarPago = async(req, res) => {
         });
     }
 }
-
 const obtenerPago = async(req, res) => {
     //? obtener del param el id del pago
     const { id } = req.params;

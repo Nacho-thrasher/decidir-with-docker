@@ -9,7 +9,7 @@ const validarMovims = async(req, res, next) => {
         if (!movim || movim == undefined) {
             const error = 'No existe la boleta correspondiente al número de transacción ingresado.'
             req.decidirLog.error = error;
-            editLog(req.decidirLog);
+            await editLog(req.decidirLog);
             return res.status(404).json({
                 message: error 
             });
