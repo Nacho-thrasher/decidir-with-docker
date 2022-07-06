@@ -1,13 +1,12 @@
-const { getPagoDecidir, postPagoDecidir } = require('../services/decidir');
+const { getPagoDecidir, postPagoDecidir, obtenerUnPago } = require('../services/decidir');
 const { getAmount, parseAmountToLong } = require('../helpers/amount');
 const { calcularMontoConInteres, calcularMontoPorCuota } = require('../helpers/cuota');
 const { editLog } = require('../helpers/logDecidir');
 const { addGesDecidir } = require('../helpers/gesDecidir');
-const axios = require('axios');
-// import ITransaction from '../db/models/ITransaction';
+
 const getStatusPago = async(req, res) => {
     let { nroTran } = req.query;
-    try { //? resolve nro transac float
+    try { 
         const getPago = await getPagoDecidir(nroTran);
         if (!getPago || getPago.length === 0) {
             const error = 'No se encontraron pagos para el número de transacción ingresado.'
@@ -21,7 +20,7 @@ const getStatusPago = async(req, res) => {
         });
 
     } catch (error) {
-        console.log('aqui',error);
+        console.log(error);
         res.status(500).json({
             message: `Ocurrió un error obteniendo pago: ${error}`,
         });
@@ -30,10 +29,9 @@ const getStatusPago = async(req, res) => {
 const ejecutarPago = async(req, res) => {
     const { nroTran, appOrigen } = req.query;
     const { movim, cuota, medioPago, PaymentRequestDto } = req;
-    try { //! paymentReq modelo de datos de pago
-        //? ges decidir log es add, va agregando los movimientos
-        const floatAmount = getAmount(movim);
-        // console.log(movim)
+    try { 
+        const floatAmount = getAmount(movim); //? obtener el monto a pagar
+        console.log(`Monto a pagar: ${floatAmount}`);
         if (floatAmount == null) {
             const error = 'No es posible ejecutar el pago debido a que no se pudo obtener el monto asociado a la transacción.'
             req.decidirLog.error = error;
@@ -45,16 +43,16 @@ const ejecutarPago = async(req, res) => {
         const longAmount = parseAmountToLong(floatAmount);
         const montoConInteres = calcularMontoConInteres(floatAmount, cuota.INTERES);
         const montoPorCuota = calcularMontoPorCuota(floatAmount, cuota.CANTIDAD, cuota.INTERES); 
-        //? Actualizo el intento de pago con decidir en la tabla GES_DECIDIR_LOG
+        //* Actualizo el intento de pago con decidir en la tabla GES_DECIDIR_LOG
         req.decidirLog.monto = floatAmount;
         req.decidirLog.cantCuotas = cuota.CANTIDAD;
         req.decidirLog.interes = cuota.INTERES;
         req.decidirLog.montoConInteres = montoConInteres;
         req.decidirLog.montoPorCuota = montoPorCuota;
         req.decidirLog = editLog(req.decidirLog);
-        
+        //* Creo el pago en decidir
         const paymentResponse = await postPagoDecidir(PaymentRequestDto, movim, longAmount, cuota.CANTIDAD, medioPago.SITE_ID);       
-        if (!paymentResponse || paymentResponse == undefined) {
+        if (!paymentResponse || paymentResponse == null) {
             const error = 'Falló el proceso ejecutarPago (Decidir).'
             req.decidirLog.error = error;
             req.decidirLog.status = 'ERROR_EJECUTAR_PAGO_API_DECIDIR';
@@ -63,10 +61,10 @@ const ejecutarPago = async(req, res) => {
                 message: error
             });
         }
-
         const statusPayment = paymentResponse.status;
+        //* Status Approved
         if (statusPayment === "approved") {
-            //? agrego en ges decidir log el pago  
+            //? agrego en ges decidir_log el pago  
             req.decidirLog.status = statusPayment;
             editLog(req.decidirLog);
             //? payment response
@@ -76,9 +74,9 @@ const ejecutarPago = async(req, res) => {
                 ticket: paymentResponse.status_details.ticket,
                 nroTran: nroTran,
             }
-            //? insertar en ges decidir log el pago
-            const gesDecidir = await addGesDecidir(nroTran, PaymentRequestDto, floatAmount, movim, paymentResponse, cuota, appOrigen );
-            if (!gesDecidir) {
+            //? insertar en ges decidir el pago
+            const gesDecidir = await addGesDecidir(nroTran, PaymentRequestDto, floatAmount, movim, paymentResponse, cuota, appOrigen);
+            if (!gesDecidir || gesDecidir == null) {
                 return res.status(404).json({
                     message: `Fallo insertando en GES_DECIDIR el pago`,
                     status: statusPayment,
@@ -89,7 +87,7 @@ const ejecutarPago = async(req, res) => {
                 data: args
             });
         }
-        //? caso rejected
+        //* Caso rejected
         else{
             let paymentErrorMessage = `Mensaje de error no controlado: ${statusPayment}`
             if (statusPayment === "rejected") {
@@ -117,37 +115,29 @@ const ejecutarPago = async(req, res) => {
     }
 }
 
-const pagoPruebaDecidir = async(req, res) => {
-    
-    const { body } = req;
-    const decidirPrivateKey = `1b19bb47507c4a259ca22c12f78e881f`
+const obtenerPago = async(req, res) => {
+    //? obtener del param el id del pago
+    const { id } = req.params;
     try {
-        //? pago decidir con axios 
-        const paymentResponse = await axios.post('https://developers.decidir.com/api/v2/payments', 
-        body, {
-            headers: {
-                'Content-Type': 'application/json',
-                'apikey': decidirPrivateKey,
-                'cache-control': 'no-cache',
-            }
+        const pago = await obtenerUnPago(id)
+        if (!pago || pago === null) {
+            const error = 'No se encontró el pago con el id ingresado.'
+            return res.status(404).json({
+                message: error
+            });
+        }
+        res.status(200).json({
+            message: 'Pago obtenido',
+            data: pago
         });
-        return await res.status(200).json({
-            message: 'Pago ejecutado',
-            data: paymentResponse.data
-        });        
-    }
-    catch (error) {
-        console.log(error.response.data);
-        //? error de la api
+
+    } catch (error) {
+        console.log(error);
         res.status(500).json({
-            message: `Ocurrió un error ejecutando pago`,
-            error: error.response.data
+            message: `Ocurrió un error obteniendo pago: ${error}`,
         });
     }
+
 }
 
-module.exports = {
-    getStatusPago,
-    ejecutarPago,
-    pagoPruebaDecidir
-}
+module.exports = { getStatusPago, ejecutarPago, obtenerPago }

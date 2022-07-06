@@ -4,9 +4,8 @@ const { getDescription } = require('../services/movimiento');
 const { insertGesDecidir } = require('../services/decidir');
 
 const addGesDecidir = async(nroTran, paymentReq, amount, movim, paymentResp, cuota, appOrigen) => {
-    if (nroTran == null || paymentReq == null || amount == null ||  movim == null || cuota == null) {
-        return null
-    }    
+    if (nroTran == null || paymentReq == null || amount == null ||  movim == null || cuota == null) return null
+        
     const descripcion = await getDescription(movim);
     const args = {
         //? new date to yyyy/mm/dd hh:mi:ss
@@ -29,13 +28,10 @@ const addGesDecidir = async(nroTran, paymentReq, amount, movim, paymentResp, cuo
         montoPorCuota: calcularMontoPorCuota(amount, cuota.CANTIDAD, cuota.INTERES),
         appOrigen: appOrigen == null || appOrigen.length == 0 ? 'SAG_BACKEND' : appOrigen,
     }
-
-    console.log('addGesDecidir: ', args);
     //? insert en ges decidir
     const gesDecidir = await insertGesDecidir(args);
     console.log('gesDecidir insert', gesDecidir);
     return args
-
 }
 
 module.exports = { addGesDecidir };

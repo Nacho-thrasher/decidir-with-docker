@@ -8,7 +8,6 @@ const getMarcaReinscripcionFicha = async(tdocu, ndocu, lugar, sector, carrera, m
         const result = await consulta(q);
         if (result.length == 0) return null;
         if (result == null) return null;
-        console.log('aqui reinsc ',result);
         return result[0]
         
     } catch (error) {
@@ -24,7 +23,6 @@ const devolverMaestro = async(tdocu, ndocu, lugar, sector, carrera, modo) => {
         const result = await consulta(q);
         if (result.length == 0) return null;
         if (result == null) return null;
-        console.log('aqui maestr ',result);
         return result[0]
         
     } catch (error) {

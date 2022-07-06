@@ -3,10 +3,9 @@ const { getByNroTran } = require('../services/movimiento');
 const { editLog } = require('../helpers/logDecidir');
 
 const validarMovims = async(req, res, next) => {
-    const { nroTran, appOrigen } = req.query;
+    const { nroTran } = req.query;
     try {
-        const movim = await getByNroTran(nroTran);
-        
+        const movim = await getByNroTran(nroTran);    
         if (!movim || movim == undefined) {
             const error = 'No existe la boleta correspondiente al número de transacción ingresado.'
             req.decidirLog.error = error;

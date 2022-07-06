@@ -14,7 +14,8 @@ const validarMedioPago = async(req, res, next) => {
             });
         }
         req.medioPago = medioPago;
-        next();       
+        next(); 
+              
     } catch (error) {
         console.log(error);
         res.status(500).json({

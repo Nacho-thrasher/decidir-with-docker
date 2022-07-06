@@ -1,11 +1,10 @@
 
 const getAmount = (movim) => {
     
-    let floatAmount = movim.TOTAL2 //? parsear luego a float
-    console.log('aqui: ', movim.TOTAL2);
+    let floatAmount = movim.TOTAL2 
     const fechaHoy = getZeroTimeDate(new Date());
     try {
-        //ver el campo fvto1 y fvto2 . Si la fecha actual es menor o igual a fvto1 tomar 1 sino tomar 2
+        //? ver el campo fvto1 y fvto2 . Si la fecha actual es menor o igual a fvto1 tomar 1 sino tomar 2
         if (fechaHoy <= movim.FVTO1) {
             floatAmount = movim.TOTAL1;
         }
@@ -13,11 +12,10 @@ const getAmount = (movim) => {
             floatAmount = movim.TOTAL2;
         }
     } catch (error) {
-        //Si fallo por algun motivo, por ejemplo que venian nulas las fechas de vencimiento toma el total 2 por default
+        //? Si fallo por algun motivo, por ejemplo que venian nulas las fechas de vencimiento toma el total 2 por default
         floatAmount = movim.TOTAL2;
     }
     return floatAmount
-
 }
 const getZeroTimeDate = (date) => {
     return new Date(date.getFullYear(), date.getMonth(), date.getDate());
@@ -25,7 +23,6 @@ const getZeroTimeDate = (date) => {
 const parseAmountToLong = (floatAmount) => {
     //? decimal format to "0.00"
     const longAmount = parseFloat(floatAmount).toFixed(2).replace('.', '');
-    console.log('longAmount', longAmount);
     return longAmount;
 }
 

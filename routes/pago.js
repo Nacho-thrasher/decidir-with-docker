@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const { getStatusPago, ejecutarPago, pagoPruebaDecidir } = require('../controllers/pago');
+const { getStatusPago, ejecutarPago, obtenerPago } = require('../controllers/pago');
 const { validarMovims } = require('../middlewares/validarMovims');
 const { validarMedioPago } = require('../middlewares/validarMedioPago');
 const { validarCuotas } = require('../middlewares/validarCuotas');
@@ -9,7 +9,7 @@ router.get('/',
     getStatusPago
 );
 router.post('/', 
-    [   //? validar req.body
+    [   
         validarBody,
         validarMovims,
         validarMedioPago,
@@ -17,8 +17,6 @@ router.post('/',
     ],
     ejecutarPago
 );
-router.post('/decidir',
-    pagoPruebaDecidir
-)
+router.get('/:id', obtenerPago)
 
 module.exports = router;
