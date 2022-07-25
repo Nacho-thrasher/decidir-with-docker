@@ -1,6 +1,7 @@
 const { addLog } = require('../helpers/logDecidir');
 
 const validarBody = (req, res, next) => {
+    console.log(`validarBody: ${req.body} ${req.query}`);
     //? en body debe haber campos (token, siteTransactionId, paymentMethodId, bin, cuotaId)
     const { token, siteTransactionId, paymentMethodId, bin, cuotaId, appOrigen } = req.body || req.query;
     if (!token || !siteTransactionId || !paymentMethodId || !bin || !cuotaId) {

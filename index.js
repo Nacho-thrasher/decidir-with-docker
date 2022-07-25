@@ -2,7 +2,8 @@
 const express = require('express');
 const oracledb = require('oracledb');
 const crypto = require('crypto'); //<-- para generar las UUIDs cuando a consulta() le pasan la option.discard_unkeyed = false (default: true)
-
+// todo: cors
+const cors = require('cors');
 //para mandar colorincherío en los consoles logs
 const conColor = require('./console_colors.js');
 
@@ -38,6 +39,7 @@ oracledb.errorUrl = true;
 /**
 * CORS
 **/
+//todo: luego descomentar
 app.use(function (req, res, next) {
     res.set({
         'Access-Control-Allow-Origin':'*',
@@ -51,6 +53,7 @@ app.use(function (req, res, next) {
     //console.log(req.originalUrl, req.query, req.body);
     next();
 });
+//todo: luego descomentar
 
 //------ nos conectamos a la BD ------
 /**

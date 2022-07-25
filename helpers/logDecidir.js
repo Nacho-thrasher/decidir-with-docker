@@ -25,9 +25,7 @@ const editLog = async(args) => {
     if (args == null) return null
     args.fechaActualizacion = new Date().toISOString().substring(0, 10) + ' ' + new Date().toISOString().substring(11, 19);
     console.log('editLog', args);
-    const response = await insertGesDecidirLog(args);
-    console.log('response: ',response);
-    
+    await insertGesDecidirLog(args);
     return args
 }
 

@@ -9,7 +9,7 @@ const getBoletaById = async (nroTran) => {
         //? si es un array vacio es porque no existe la boleta
         if (result.length == 0) return null;
         if (result == null) return null;
-        return result;
+        return result[0];
         
     } catch (error) {
         console.log(error);

@@ -3,11 +3,12 @@ const { DECIDIR_URL, DECIDIR_PUBLIC_KEY }  = process.env;
 const urlDecidir = `https://developers.decidir.com/api/v2/`
 const publicKey  = `96e7f0d36a0648fb9a8dcb50ac06d260`
 const axios = require('axios');
+const http = require('https');
 
 const createToken = async(req, res) => {
     try {
         let args = object(req.body);
-        //? generar el token con axios con headers
+        //? generar token con https 
         const response = await axios.post(`${urlDecidir}tokens`, args, {
             headers: {
                 'Content-Type': 'application/json',
@@ -16,7 +17,7 @@ const createToken = async(req, res) => {
             }
         });
         res.json(response.data);
-    
+        
     } catch (error) {
         console.log(error);
         res.status(500).json({

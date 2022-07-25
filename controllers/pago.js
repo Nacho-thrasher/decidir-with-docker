@@ -5,13 +5,24 @@ const { editLog } = require('../helpers/logDecidir');
 const { addGesDecidir } = require('../helpers/gesDecidir');
 
 const getStatusPago = async(req, res) => {
+    console.log('Obteniendo estado de pago');
     let { nroTran } = req.query;
     try { 
         const getPago = await getPagoDecidir(nroTran);
         if (!getPago || getPago.length === 0) {
             const error = 'No se encontraron pagos para el número de transacción ingresado.'
-            return res.status(404).json({
-                message: error
+            return res.json({
+                token: null,
+                date: null,
+                date_created: null,
+                date_approved: null,
+                date_last_updated: null,
+                status: null,
+                status_details: null,
+                confirmed: null,
+                pan: null,
+                customer_token: null,
+                card_data: null,
             });
         }
         res.status(200).json({
@@ -70,10 +81,10 @@ const ejecutarPago = async(req, res) => {
             await editLog(req.decidirLog);
             //? payment response
             const args = {
-                id: paymentResponse.id,
+                id: parseInt(paymentResponse.id),
                 status: statusPayment,
-                ticket: paymentResponse.status_details.ticket,
-                nroTran: nroTran,
+                ticket: (paymentResponse.status_details.ticket).toString(),
+                nroTran: parseInt(nroTran),
             }
             //? insertar en ges decidir el pago
             const gesDecidir = await addGesDecidir(nroTran, PaymentRequestDto, floatAmount, movim, paymentResponse, cuota, appOrigen);
@@ -83,10 +94,8 @@ const ejecutarPago = async(req, res) => {
                     status: statusPayment,
                 });
             }
-            return res.status(200).json({
-                message: 'Pago ejecutado',
-                data: args
-            });
+            console.log(`status: ${statusPayment}`);
+            return res.status(200).json(args);
         }
         //* Caso rejected
         else{
@@ -137,7 +146,6 @@ const obtenerPago = async(req, res) => {
             message: `Ocurrió un error obteniendo pago: ${error}`,
         });
     }
-
 }
 
 module.exports = { getStatusPago, ejecutarPago, obtenerPago }
