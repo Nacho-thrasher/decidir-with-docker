@@ -4,11 +4,8 @@ const getBoleta = async(req, res) => {
     let { nroTran } = req.query;
     try { 
         const movim = await getBoletaById(nroTran);
-        if (!movim) {
-            return res.status(404).json({
-                message: 'No existe la boleta correspondiente al número de transacción ingresado.'
-            });
-        }
+        if (!movim) 
+        return res.status(400).send('No existe la boleta correspondiente al número de transacción ingresado.');
         const boleta = {
             gesMovimsCodBarra2PK: {
                 nroComp1: movim.NRO_COMP1,
@@ -40,14 +37,10 @@ const getBoleta = async(req, res) => {
             nroVisa: movim.NRO_VISA,
         }  
         res.status(200).json(boleta);
-    } catch (error) {
+    } 
+    catch (error) {
         console.log(error);
-        res.status(500).json({
-            message: `Ocurrió un error obteniendo movimiento: ${error}`,
-        });
+        res.status(500).send(`Ocurrió un error obteniendo movimiento: ${error}`);
     }
 }
-
-module.exports = {
-    getBoleta
-}
+module.exports = { getBoleta }

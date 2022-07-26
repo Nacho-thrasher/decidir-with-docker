@@ -1,6 +1,6 @@
-const router = require('express').Router();
-const { getBoleta } = require('../controllers/boleta');
+const router = require("express").Router();
+const { getBoleta } = require("../controllers/boleta");
 
-router.get('/', getBoleta);
+router.get("/", getBoleta);
 
 module.exports = router;

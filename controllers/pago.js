@@ -32,9 +32,7 @@ const getStatusPago = async(req, res) => {
 
     } catch (error) {
         console.log(error);
-        res.status(500).json({
-            message: `Ocurrió un error obteniendo pago: ${error}`,
-        });
+        res.status(500).send(`Ocurrió un error obteniendo pago: ${error}`);
     }
 }
 const ejecutarPago = async(req, res) => {
@@ -47,9 +45,7 @@ const ejecutarPago = async(req, res) => {
             const error = 'No es posible ejecutar el pago debido a que no se pudo obtener el monto asociado a la transacción.'
             req.decidirLog.error = error;
             await editLog(req.decidirLog);
-            return res.status(404).json({
-                message: error
-            });
+            return res.status(400).send(error);
         }
         const longAmount = parseAmountToLong(floatAmount);
         const montoConInteres = calcularMontoConInteres(floatAmount, cuota.INTERES);
@@ -68,7 +64,7 @@ const ejecutarPago = async(req, res) => {
             req.decidirLog.error = error;
             req.decidirLog.status = 'ERROR_EJECUTAR_PAGO_API_DECIDIR';
             await editLog(req.decidirLog);
-            return res.status(404).json({
+            return res.status(400).json({
                 message: error,
                 type: paymentResponse.error
             });
@@ -89,7 +85,7 @@ const ejecutarPago = async(req, res) => {
             //? insertar en ges decidir el pago
             const gesDecidir = await addGesDecidir(nroTran, PaymentRequestDto, floatAmount, movim, paymentResponse, cuota, appOrigen);
             if (!gesDecidir || gesDecidir == null) {
-                return res.status(404).json({
+                return res.status(400).json({
                     message: `Fallo insertando en GES_DECIDIR el pago`,
                     status: statusPayment,
                 });
@@ -111,7 +107,7 @@ const ejecutarPago = async(req, res) => {
                 Codigo de autorización de la tarjeta: ${paymentResponse.status_details.card_authorization_code} \n
                 Código de validación de dirección: ${paymentResponse.status_details.address_validation_code} \n
                 `;
-                return res.status(404).json({
+                return res.status(400).json({
                     message: paymentErrorMessage
                 });
             }
@@ -119,9 +115,7 @@ const ejecutarPago = async(req, res) => {
     } 
     catch (error) {
         console.log(error);
-        res.status(500).json({
-            message: `Ocurrió un error ejecutando pago: ${error}`,
-        });
+        res.status(500).send(`Ocurrió un error ejecutando pago: ${error}`);
     }
 }
 const obtenerPago = async(req, res) => {
@@ -131,9 +125,7 @@ const obtenerPago = async(req, res) => {
         const pago = await obtenerUnPago(id)
         if (!pago || pago === null) {
             const error = 'No se encontró el pago con el id ingresado.'
-            return res.status(404).json({
-                message: error
-            });
+            return res.status(400).send(error);
         }
         res.status(200).json({
             message: 'Pago obtenido',
@@ -142,9 +134,7 @@ const obtenerPago = async(req, res) => {
 
     } catch (error) {
         console.log(error);
-        res.status(500).json({
-            message: `Ocurrió un error obteniendo pago: ${error}`,
-        });
+        res.status(500).send(`Ocurrió un error obteniendo pago: ${error}`);
     }
 }
 

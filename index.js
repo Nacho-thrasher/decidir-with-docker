@@ -2,8 +2,6 @@
 const express = require('express');
 const oracledb = require('oracledb');
 const crypto = require('crypto'); //<-- para generar las UUIDs cuando a consulta() le pasan la option.discard_unkeyed = false (default: true)
-// todo: cors
-const cors = require('cors');
 //para mandar colorincherío en los consoles logs
 const conColor = require('./console_colors.js');
 
@@ -16,11 +14,12 @@ try {
     divisor("_",2);
     console.log('Inicializando el cliente oracle...');
     oracledb.initOracleClient();
-  } catch (err) {
+} 
+catch (err) {
     console.error(conColor.Red,'Error al iniciar el cliente de Oracle');
     console.error(err);
     process.exit(1);
-  }
+}
 
 // ------ instancio la app express ------
 const app = express()
