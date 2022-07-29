@@ -2,7 +2,6 @@ const { consulta } = require('../index');
 
 const getCuotaByID = async(idCuota) => {
     try {
-
         let q = `SELECT * FROM TBL_DEC_CUOTAS WHERE CUOTA_ID = ${idCuota}`;
 
         const result = await consulta(q);

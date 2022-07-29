@@ -4,6 +4,9 @@ const getByNroTran = async(req, res) => {
     const { nroTran } = req.query;
     try {
         let q = `SELECT * FROM GES_DECIDIR_LOG WHERE NRO_TRANSAC = ${nroTran}`;
+        //? y fue aprobado? si no, no se muestra
+        //? si fue rechazado, se muestra el mensaje de rechazo
+        //? si es nulo, se muestra
         const result = await consulta(q);
         if (result.length == 0) return res.json(null); 
         return res.json({
@@ -12,7 +15,6 @@ const getByNroTran = async(req, res) => {
             status: result[0].STATUS,
             error: result[0].ERROR,
         });
-    
 
     } catch (error) {
         console.log(error);

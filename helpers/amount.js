@@ -1,6 +1,12 @@
 
-const getAmount = (movim) => {
-    
+const getAmount = (movim, firstAmount, secondAmount) => {
+    //? si recibimos monto 1 o monto 2, comprovamos q no sea mayor que el monto total 
+    if (firstAmount && secondAmount == null){
+        return firstAmount
+    }else if (firstAmount && secondAmount) {
+        return secondAmount
+    }
+
     let floatAmount = movim.TOTAL2 
     const fechaHoy = getZeroTimeDate(new Date());
     try {

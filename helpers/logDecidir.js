@@ -17,7 +17,11 @@ const addLog = (nroTran, paymentReq, appOrigen) => {
         'status': null,
         'error': null,
         'nroTran': nroTran,
-        'appOrigen': appOrigen == null || appOrigen.length == 0 ? 'SAG_BACKEND' : appOrigen
+        'appOrigen': appOrigen == null || appOrigen.length == 0 ? 'SAG_BACKEND' : appOrigen,
+        'nroOperacion': null,
+        'montoAPagar': null,
+        'ticket': null,
+        'nroTransacParte': null,
     }
     return args
 }

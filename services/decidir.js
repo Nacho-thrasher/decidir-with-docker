@@ -20,19 +20,19 @@ const getPagoDecidir = async(siteTransactionId) => {
             }
         })
         return await payments.data.results;  
-
-    } catch (error) {
+    }
+    catch (error) {
         console.log(error);
         return null;
     }
 }
-const postPagoDecidir = async(paymentRequest, movim, amount, cuotas, siteId) => {
+const postPagoDecidir = async(paymentRequest, movim, amount, cuotas, siteId, nroTransacParte) => {
     if (paymentRequest == null || movim == null) return null;     
     try {
         const args = {
             "establishment_name": "UCASAL",
             "token": paymentRequest.token,
-            "site_transaction_id": (movim.NRO_TRANSAC).toString(),
+            "site_transaction_id": nroTransacParte ? nroTransacParte : (movim.NRO_TRANSAC).toString(),
             // "site_id": (siteId).toString(), 
             "payment_method_id": paymentRequest.paymentMethodId,
             "bin": paymentRequest.bin,
@@ -99,9 +99,10 @@ const insertGesDecidir = async(args) => {
 const insertGesDecidirLog = async(args) => {
 
     let q = `INSERT INTO GES_DECIDIR_LOG
-    (ID, FECHA_CREACION, FECHA_ACTUALIZACION, ID_MEDIO_PAGO, BIN, MONTO, CANT_CUOTAS, INTERES, MONTO_CON_INTERES, MONTO_X_CUOTA, STATUS, ERROR, NRO_TRANSAC, APP_ORIGEN)
-    VALUES ('${args.gesDecidirLogId}', TO_DATE('${args.fechaCreacion}', 'yyyy/mm/dd hh24:mi:ss'), TO_DATE('${args.fechaActualizacion}', 'yyyy/mm/dd hh24:mi:ss'), ${parseInt(args.idMedioPago)}, '${args.bin}', ${parseInt(args.monto)}, ${parseInt(args.cantCuotas)}, ${parseInt(args.interes)}, ${parseInt(args.montoConInteres)}, ${parseInt(args.montoPorCuota)}, '${args.status}', '${args.error}', ${parseInt(args.nroTran)}, '${args.appOrigen}')`;
-    
+    (ID, FECHA_CREACION, FECHA_ACTUALIZACION, ID_MEDIO_PAGO, BIN, MONTO, CANT_CUOTAS, INTERES, MONTO_CON_INTERES, MONTO_X_CUOTA, STATUS, ERROR, NRO_TRANSAC, APP_ORIGEN, NRO_OPERACION, MONTO_A_PAGAR, TICKET, NRO_TRANSAC_PARTE)
+    VALUES ('${args.gesDecidirLogId}', TO_DATE('${args.fechaCreacion}', 'yyyy/mm/dd hh24:mi:ss'), TO_DATE('${args.fechaActualizacion}', 'yyyy/mm/dd hh24:mi:ss'), ${parseInt(args.idMedioPago)}, '${args.bin}', ${parseInt(args.monto)},${parseInt(args.cantCuotas)}, ${parseInt(args.interes)}, ${parseInt(args.montoConInteres)}, ${parseInt(args.montoPorCuota)}, '${args.status}', '${args.error}', ${parseInt(args.nroTran)}, '${args.appOrigen}',${parseInt(args.nroOperacion)},${parseInt(args.montoAPagar)},'${args.ticket}',${args.nroTransacParte})`;
+    //? nro operacion -> id Decidir, monto a pagar, ticket, nro transac parte -1 o -2    
+    console.log(q);
     const result = await consulta(q);
     return result;
 

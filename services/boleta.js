@@ -5,7 +5,6 @@ const getBoletaById = async (nroTran) => {
     let q = `SELECT * FROM GES_MOVIMS_COD_BARRA2 
                 WHERE NRO_TRANSAC = ${nroTran}`;
     const result = await consulta(q);
-    //? si es un array vacio es porque no existe la boleta
     if (result == null || result.length == 0) return null;
     return result[0];
   } catch (error) {

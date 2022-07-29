@@ -10,8 +10,10 @@ const getAll2 = async(req, res) => {
         const result = await consulta(q);
         if (result.length == 0) return res.status(400).send('No existen proveedores de pagos habilitados.');
         //* medios de pagos por id de proveedor de pagos
-        q2 = `SELECT * FROM TBL_DEC_MEDIO_PAGOS WHERE PROVEEDOR_PAGO_ID = ${result[0].PROVEEDOR_PAGO_ID} AND HABILITADO = 1`;
+        //! 3 -> decidir cambiar a query 
+        q2 = `SELECT * FROM TBL_DEC_MEDIO_PAGOS WHERE PROVEEDOR_PAGO_ID = 3 AND HABILITADO = 1`;
         const result2 = await consulta(q2);
+        
         if (result2.length == 0) return res.status(400).send('No existen medios de pagos habilitados.');
         const data = result.map(item => {
             return {
@@ -46,6 +48,7 @@ const getById = async(req, res) => {
     const { id, nroTran } = req.query;
     try {
         let q = `SELECT * FROM TBL_DEC_PROVEEDOR_PAGOS WHERE PROVEEDOR_PAGO_ID = ${id}`;
+        console.log(`q: ${q}`);
         const result = await consulta(q);
         if (result.length == 0 || result[0].HABILITADO === 0) return res.status(400).send('No existe el proveedor de pagos.');
 
