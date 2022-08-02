@@ -4,7 +4,7 @@ const axios = require('axios');
 const decidirUrl = `https://developers.decidir.com/api/v2/`
 const decidirPrivateKey = `1b19bb47507c4a259ca22c12f78e881f`
 const { consulta } = require('../index');
-
+//? manejo de errores con tracerId 
 const getPagoDecidir = async(siteTransactionId) => {
     if (siteTransactionId == null || siteTransactionId.length == 0) return null;     
     try {
@@ -94,19 +94,44 @@ const insertGesDecidir = async(args) => {
     
     const result = await consulta(q);
     return result;
-
 }
 const insertGesDecidirLog = async(args) => {
-
+    //* 1 inserto en ges_decidir_log
+    //! TODO: MONTO_A_PAGAR
     let q = `INSERT INTO GES_DECIDIR_LOG
-    (ID, FECHA_CREACION, FECHA_ACTUALIZACION, ID_MEDIO_PAGO, BIN, MONTO, CANT_CUOTAS, INTERES, MONTO_CON_INTERES, MONTO_X_CUOTA, STATUS, ERROR, NRO_TRANSAC, APP_ORIGEN, NRO_OPERACION, MONTO_A_PAGAR, TICKET, NRO_TRANSAC_PARTE)
-    VALUES ('${args.gesDecidirLogId}', TO_DATE('${args.fechaCreacion}', 'yyyy/mm/dd hh24:mi:ss'), TO_DATE('${args.fechaActualizacion}', 'yyyy/mm/dd hh24:mi:ss'), ${parseInt(args.idMedioPago)}, '${args.bin}', ${parseInt(args.monto)},${parseInt(args.cantCuotas)}, ${parseInt(args.interes)}, ${parseInt(args.montoConInteres)}, ${parseInt(args.montoPorCuota)}, '${args.status}', '${args.error}', ${parseInt(args.nroTran)}, '${args.appOrigen}',${parseInt(args.nroOperacion)},${parseInt(args.montoAPagar)},'${args.ticket}',${args.nroTransacParte})`;
-    //? nro operacion -> id Decidir, monto a pagar, ticket, nro transac parte -1 o -2    
-    console.log(q);
-    const result = await consulta(q);
-    return result;
+    (ID, FECHA_CREACION, FECHA_ACTUALIZACION, ID_MEDIO_PAGO, BIN, MONTO, CANT_CUOTAS, INTERES, MONTO_CON_INTERES, MONTO_X_CUOTA, STATUS, ERROR, NRO_TRANSAC, APP_ORIGEN, NRO_OPERACION, NRO_COMP1, NRO_COMP2, MONTO_A_APGAR, DESCRIPCION, TIPO_OPERACION, TICKET, NRO_TRANSAC_PARTE)
+    VALUES ('${args.gesDecidirLogId}', 
+        TO_DATE('${args.fechaCreacion}', 'yyyy/mm/dd hh24:mi:ss'), 
+        TO_DATE('${args.fechaActualizacion}', 'yyyy/mm/dd hh24:mi:ss'), 
+        ${parseInt(args.idMedioPago)}, 
+        '${args.bin}', 
+        ${parseInt(args.monto)},
+        ${parseInt(args.cantCuotas)}, 
+        ${parseInt(args.interes)}, 
+        ${parseInt(args.montoConInteres)}, 
+        ${parseInt(args.montoPorCuota)}, 
+        '${args.status}', 
+        '${args.error}', 
+        ${parseInt(args.nroTran)}, 
+        '${args.appOrigen}',
+        ${parseInt(args.nroOperacion)},
+        ${parseInt(args.nroComp1)},
+        ${parseInt(args.nroComp2)},
+        ${parseInt(args.montoAPagar)},
+        '${args.descripcion}',
+        '${args.tipoOperacion}',
+        '${args.ticket}',
+        '${args.nroTransacParte}')`;
 
+    const result = await consulta(q);
+    //* 2 consultar ges decidir log si se inserto correctamente
+    let q2 = `SELECT * FROM GES_DECIDIR_LOG WHERE ID = '${args.gesDecidirLogId}'`;
+    const result2 = await consulta(q2);
+    return result2;
 }
 
-
 module.exports = { getPagoDecidir, postPagoDecidir, insertGesDecidir, obtenerUnPago, insertGesDecidirLog};
+//? traer promociones de tarjeta
+// SELECT * FROM TBL_DEC_MEDIO_PAGO_ENT_FINANC
+// JOIN TBL_MEDIO_PAGO_PROMOCION ON TBL_DEC_MEDIO_PAGO_ENT_FINANC.MPAGO_ENT_FINANC_ID = TBL_MEDIO_PAGO_PROMOCION.MPAGO_ENT_FINANC_ID
+// JOIN TBL_PAGOS_PROMOCIONES ON TBL_PAGOS_PROMOCIONES.PAGO_PROMOCION_ID = TBL_MEDIO_PAGO_PROMOCION.PAGO_PROMOCION_ID   

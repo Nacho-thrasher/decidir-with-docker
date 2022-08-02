@@ -1,12 +1,14 @@
 
-const getAmount = (movim, firstAmount, secondAmount) => {
+const getAmount = (movim, firstAmount, secondAmount, pendiente) => {
+    if (pendiente) {
+        return movim.montoPendiente;
+    }
     //? si recibimos monto 1 o monto 2, comprovamos q no sea mayor que el monto total 
     if (firstAmount && secondAmount == null){
         return firstAmount
     }else if (firstAmount && secondAmount) {
         return secondAmount
     }
-
     let floatAmount = movim.TOTAL2 
     const fechaHoy = getZeroTimeDate(new Date());
     try {
@@ -31,5 +33,4 @@ const parseAmountToLong = (floatAmount) => {
     const longAmount = parseFloat(floatAmount).toFixed(2).replace('.', '');
     return longAmount;
 }
-
 module.exports = { getAmount, parseAmountToLong };

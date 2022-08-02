@@ -1,5 +1,5 @@
 const { getCuotaByID } = require('../services/cuota');
-const { editLog } = require('../helpers/logDecidir');
+const { insertLog } = require('../helpers/logDecidir');
 
 const validarCuotas = async(req, res, next) => {
     const { cuotaId } = req.body;
@@ -8,12 +8,14 @@ const validarCuotas = async(req, res, next) => {
         if (!cuota || cuota == undefined) {
             const error = 'No existe la cuota correspondiente al ID ingresado.'
             req.decidirLog.error = error;
-            await editLog(req.decidirLog);
+            await insertLog(req.decidirLog);
             return res.status(404).json({
                 message: error
             });
         }
         req.cuota = cuota;
+        req.decidirLog.cantCuotas = cuota.CANTIDAD;
+        req.decidirLog.interes = cuota.INTERES;
         next();       
         
     } catch (error) {

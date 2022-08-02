@@ -54,5 +54,16 @@ const getDescription = async (movim) => {
 
   return descripcion;
 };
+const getGesDecidirLog = async (nroTran) => {
+  try {
+    let q = `SELECT * FROM GES_DECIDIR_LOG WHERE NRO_TRANSAC = ${nroTran} AND STATUS = 'approved'`;
+    const result = await consulta(q);
+    if (result == null || result.length == 0) return null;
+    return result[0];
+  } catch (error) {
+    console.log(error);
+    return 'error';
+  }
+}
 
-module.exports = { getByNroTran, getDescription };
+module.exports = { getByNroTran, getDescription, getGesDecidirLog };

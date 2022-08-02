@@ -1,19 +1,33 @@
 // const { nroTran, appOrigen } = req.query || req.body;
-const { getByNroTran } = require("../services/movimiento");
-const { editLog } = require("../helpers/logDecidir");
+const { getByNroTran, getGesDecidirLog } = require("../services/movimiento");
+const { insertLog } = require("../helpers/logDecidir");
 
 const validarMovims = async (req, res, next) => {
   const { nroTran } = req.query;
   try {
+    //* 1 - Validar que exista el movimiento
     const movim = await getByNroTran(nroTran);
     if (!movim || movim == undefined) {
-      const error =
-        "No existe la boleta correspondiente al número de transacción ingresado.";
+      const error = "No existe la boleta correspondiente al número de transacción ingresado.";
       req.decidirLog.error = error;
-      await editLog(req.decidirLog);
+      await insertLog(req.decidirLog);
       return res.status(400).send(error);
     }
+    //* 2 - Validar si existe una transacción pendiente en gesDecidirLog
+    const gesDecidirLog = await getGesDecidirLog(nroTran);
+    if (gesDecidirLog != null) {
+      if (gesDecidirLog.MONTO < gesDecidirLog.MONTO_A_APGAR) {
+        movim.pendiente = true;
+        movim.montoPendiente = gesDecidirLog.MONTO_A_APGAR - gesDecidirLog.MONTO;
+        console.log("movim.montoPendiente", movim.montoPendiente);
+      }
+      else{ 
+        movim.pendiente = false;  
+      }
+    }
     req.movim = movim;
+    req.decidirLog.nroComp1 = movim.NRO_COMP1,
+    req.decidirLog.nroComp2 = movim.NRO_COMP2,
     next();
   } catch (error) {
     console.log(error);

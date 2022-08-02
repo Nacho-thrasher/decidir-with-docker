@@ -19,18 +19,26 @@ const addLog = (nroTran, paymentReq, appOrigen) => {
         'nroTran': nroTran,
         'appOrigen': appOrigen == null || appOrigen.length == 0 ? 'SAG_BACKEND' : appOrigen,
         'nroOperacion': null,
+        'nroComp1': null,
+        'nroComp2': null,
         'montoAPagar': null,
+        'descripcion': null,
+        'tipoOperacion': null,
         'ticket': null,
         'nroTransacParte': null,
     }
     return args
 }
-const editLog = async(args) => {
+const insertLog = async(args) => {
     if (args == null) return null
     args.fechaActualizacion = new Date().toISOString().substring(0, 10) + ' ' + new Date().toISOString().substring(11, 19);
-    console.log('editLog', args);
-    await insertGesDecidirLog(args);
-    return args
+    const resp = await insertGesDecidirLog(args);
+    //? si llega nulo o fallo se retorna null
+    //? si llega un objeto, se retorna el objeto y se realiza consulta sum(monto) para ver si se pagó correctamente, si esta completo el pago inserto en ges decidir
+    console.log('insertLog :', resp);
+    return resp
 }
 
-module.exports = { addLog, editLog };
+
+
+module.exports = { addLog, insertLog };

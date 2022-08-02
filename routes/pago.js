@@ -5,10 +5,10 @@ const {
   obtenerPago,
   ejecutarPagoParte
 } = require("../controllers/pago");
-const { validarMovims } = require("../middlewares/validarMovims");
-const { validarMedioPago } = require("../middlewares/validarMedioPago");
-const { validarCuotas } = require("../middlewares/validarCuotas");
-const { validarBody } = require("../middlewares/validarBody");
+const { validarMovims }     = require("../middlewares/validarMovims");
+const { validarMedioPago }  = require("../middlewares/validarMedioPago");
+const { validarCuotas }     = require("../middlewares/validarCuotas");
+const { validarBody }       = require("../middlewares/validarBody");
 
 router.get("/", estadoPago);
 router.post(
