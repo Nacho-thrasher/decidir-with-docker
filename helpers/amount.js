@@ -1,13 +1,13 @@
+const { calcularMontoConInteres, calcularMontoPorCuota } = require('../helpers/cuota');
 
-const getAmount = (movim, firstAmount, secondAmount, pendiente) => {
+const getAmount = (movim, monto, pendiente) => {
     if (pendiente) {
         return movim.montoPendiente;
     }
     //? si recibimos monto 1 o monto 2, comprovamos q no sea mayor que el monto total 
-    if (firstAmount && secondAmount == null){
-        return firstAmount
-    }else if (firstAmount && secondAmount) {
-        return secondAmount
+    if (monto){
+        //? verificar sea menor que el monto total
+        return monto
     }
     let floatAmount = movim.TOTAL2 
     const fechaHoy = getZeroTimeDate(new Date());
@@ -33,4 +33,18 @@ const parseAmountToLong = (floatAmount) => {
     const longAmount = parseFloat(floatAmount).toFixed(2).replace('.', '');
     return longAmount;
 }
-module.exports = { getAmount, parseAmountToLong };
+const getAllAmounts = (montos, interes, cantidad) => {
+    //? monto es un objeto con total y monto si monto viene null ejecutar funciones con total, si no con monto
+    const monto = montos.monto ? montos.monto : montos.total;
+    const longAmount = parseAmountToLong(monto);
+    const montoConInteres = calcularMontoConInteres(monto, interes);
+    const montoPorCuota = calcularMontoPorCuota(monto, cantidad, interes);
+    
+    return {
+        longAmount: longAmount,
+        montoConInteres: montoConInteres,
+        montoPorCuota: montoPorCuota,
+    }
+}
+
+module.exports = { getAmount, parseAmountToLong, getAllAmounts };

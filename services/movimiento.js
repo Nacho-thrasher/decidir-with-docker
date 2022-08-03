@@ -7,12 +7,11 @@ const {
 const getByNroTran = async (nroTran) => {
   try {
     //? tmb consultar a ges-decidir para ver si el movimiento existe
-    let q = `SELECT * FROM GES_MOVIMS_COD_BARRA2 
-                WHERE NRO_TRANSAC = ${nroTran}`;
-
+    let q = `SELECT * FROM GES_MOVIMS_COD_BARRA2 WHERE NRO_TRANSAC = ${nroTran}`;
     const result = await consulta(q);
     if (result == null || result.length == 0) return null;
     return result[0];
+    
   } catch (error) {
     console.log(error);
     return null;
@@ -60,10 +59,38 @@ const getGesDecidirLog = async (nroTran) => {
     const result = await consulta(q);
     if (result == null || result.length == 0) return null;
     return result[0];
+  } 
+  catch (error) {
+    console.log(error);
+    return 'error';
+  }
+}
+const getMontoGesDecidirLog = async (nroTran) => {
+  try {
+
+    let q = `SELECT SUM(MONTO) FROM GES_DECIDIR_LOG WHERE NRO_TRANSAC = ${nroTran} AND STATUS = 'approved'`;
+    const result = await consulta(q);
+    if (result == null || result.length == 0) return null;
+    return result[0]['SUM(MONTO)'];
+
   } catch (error) {
     console.log(error);
     return 'error';
   }
 }
+const countMovimsGesDecidirLog = async (nroTran) => {
+  try {
+    
+    let q = `SELECT COUNT(*) FROM GES_DECIDIR_LOG WHERE NRO_TRANSAC = ${nroTran} AND STATUS = 'approved'`;
+    const result = await consulta(q);
+    if (result == null || result.length == 0) return null;
+    return result[0]['COUNT(*)'];
 
-module.exports = { getByNroTran, getDescription, getGesDecidirLog };
+  } 
+  catch (error) {
+    console.log(error);
+    return 'error';
+  }
+}
+
+module.exports = { getByNroTran, getDescription, getGesDecidirLog, getMontoGesDecidirLog, countMovimsGesDecidirLog };

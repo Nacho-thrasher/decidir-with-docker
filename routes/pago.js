@@ -9,17 +9,13 @@ const { validarMovims }     = require("../middlewares/validarMovims");
 const { validarMedioPago }  = require("../middlewares/validarMedioPago");
 const { validarCuotas }     = require("../middlewares/validarCuotas");
 const { validarBody }       = require("../middlewares/validarBody");
+const { validarNroTarjeta } = require("../middlewares/validarNroTarjeta");
 
 router.get("/", estadoPago);
 router.post(
   "/",
-  [validarBody, validarMovims, validarMedioPago, validarCuotas],
+  [validarBody, validarMovims, validarMedioPago, validarCuotas, validarNroTarjeta],
   ejecutarPago
-);
-router.post(
-  "/parte", 
-  [validarBody, validarMovims, validarMedioPago, validarCuotas],
-  ejecutarPagoParte  
 );
 
 router.get("/:id", obtenerPago);

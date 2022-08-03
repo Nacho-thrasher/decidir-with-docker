@@ -37,7 +37,6 @@ const getBoleta = async(req, res) => {
             nroVisa: movim.NRO_VISA,
             pendiente: movim.PENDIENTE ? movim.PENDIENTE : null,
         }  
-        console.log('boleta entro');
         res.status(200).json(boleta);
     } 
     catch (error) {

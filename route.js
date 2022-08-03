@@ -6,7 +6,7 @@ const pagoRoute = require('./routes/pago');
 const proveedorPagosRoute = require('./routes/proveedor-pagos');
 const entidadesFinancieras = require('./routes/entidades-financieras');
 const cuotasRoute = require('./routes/cuotas');
-const decidirLogRoute = require('./routes/decidir-log');
+const decidirLogRoute = require('./routes/decidirLog');
 
 router.use('/token', tokenRoute);
 router.use('/boleta', boletaRoute);

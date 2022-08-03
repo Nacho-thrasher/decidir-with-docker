@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const { getByNroTran } = require('../controllers/decidir-log');
+const { getByNroTran } = require('../controllers/decidirLog');
 
 router.get('/', getByNroTran);
 

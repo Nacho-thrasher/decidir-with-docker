@@ -1,22 +1,18 @@
 const { consulta } = require("../index");
+const { getMontoGesDecidirLog, getByNroTran } = require("../services/movimiento");
 //* servicio de boleta
 const getBoletaById = async (nroTran) => {
   try {
-    
-    let q = `SELECT * FROM GES_MOVIMS_COD_BARRA2 WHERE NRO_TRANSAC = ${nroTran}`;  
-    const result = await consulta(q);
-    let q2 = `SELECT SUM(MONTO) FROM GES_DECIDIR_LOG WHERE nro_transac = ${nroTran} AND STATUS = 'approved'`
-    const result2 = await consulta(q2);
-    
-    if (result == null || result.length == 0) return null;
-    if (result2[0]['SUM(MONTO)'] != null && result2[0]['SUM(MONTO)'] < result[0].TOTAL1) 
+    const boleta = await getByNroTran(nroTran);
+    const montoPagado = await getMontoGesDecidirLog(nroTran);
+    if (boleta == null) return null;
+    if (montoPagado != null && montoPagado < boleta.TOTAL1) 
     {   
-      result[0].PENDIENTE = result[0].TOTAL1 - result2[0]['SUM(MONTO)'];
-    }
-    console.log('result :', result[0]);
-    return result[0];
-
-  } catch (error) {
+      boleta.PENDIENTE = boleta.TOTAL1 - montoPagado;
+    }    
+    return boleta;
+  } 
+  catch (error) {
     console.log(error);
     return null;
   }

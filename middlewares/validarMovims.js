@@ -1,9 +1,9 @@
 // const { nroTran, appOrigen } = req.query || req.body;
-const { getByNroTran, getGesDecidirLog } = require("../services/movimiento");
+const { getByNroTran, getGesDecidirLog, getMontoGesDecidirLog } = require("../services/movimiento");
 const { insertLog } = require("../helpers/logDecidir");
 
 const validarMovims = async (req, res, next) => {
-  const { nroTran } = req.query;
+  const { nroTran, appOrigen } = req.query;
   try {
     //* 1 - Validar que exista el movimiento
     const movim = await getByNroTran(nroTran);
@@ -14,11 +14,13 @@ const validarMovims = async (req, res, next) => {
       return res.status(400).send(error);
     }
     //* 2 - Validar si existe una transacción pendiente en gesDecidirLog
-    const gesDecidirLog = await getGesDecidirLog(nroTran);
+    const gesDecidirLog = await getGesDecidirLog(nroTran); //* monto a pagar
+    const montoPagado = await getMontoGesDecidirLog(nroTran); //* monto pagado
+    //* 3 - Validar que el monto pagado sea igual al monto a pagar
     if (gesDecidirLog != null) {
-      if (gesDecidirLog.MONTO < gesDecidirLog.MONTO_A_APGAR) {
+      if (montoPagado < gesDecidirLog.MONTO_A_APGAR) { 
         movim.pendiente = true;
-        movim.montoPendiente = gesDecidirLog.MONTO_A_APGAR - gesDecidirLog.MONTO;
+        movim.montoPendiente = gesDecidirLog.MONTO_A_APGAR - montoPagado;
         console.log("movim.montoPendiente", movim.montoPendiente);
       }
       else{ 
@@ -28,8 +30,10 @@ const validarMovims = async (req, res, next) => {
     req.movim = movim;
     req.decidirLog.nroComp1 = movim.NRO_COMP1,
     req.decidirLog.nroComp2 = movim.NRO_COMP2,
+    req.decidirLog.appOrigen = appOrigen
     next();
-  } catch (error) {
+  } 
+  catch (error) {
     console.log(error);
     const err = `Ocurrió un error obteniendo movimiento: ${error}`;
     res.status(500).json({
