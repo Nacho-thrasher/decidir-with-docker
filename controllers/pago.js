@@ -65,17 +65,14 @@ const ejecutarPago = async(req, res) => {
         req.decidirLog.montoPorCuota = montoPorCuota;
         //* Creo el pago en decidir
         const paymentResponse = await postPagoDecidir(PaymentRequestDto, movim, longAmount, cuota.CANTIDAD, medioPago.SITE_ID, nroTransacParte);       
-        // devolver payment data correctamente y si estado no es ni rejected ni approved entra aqui
+        //todo: devolver payment data correctamente y si estado no es ni rejected ni approved entra aqui
         if (!paymentResponse || paymentResponse == null || paymentResponse.error != null) {
-            console.log(`linea 69: `,paymentResponse);
             const error = 'Falló el proceso ejecutarPago (Decidir).'
-            req.decidirLog.error = error;
             req.decidirLog.status = 'ERROR_EJECUTAR_PAGO_API_DECIDIR';
+            req.decidirLog.error = error;
+            //todo: datos faltantes para insertar en GES_DECIDIR_LOG
             await insertLog(req.decidirLog);
-            return res.status(400).json({
-                message: `error - ${paymentResponse.error}`,
-                type: paymentResponse.error
-            });
+            return res.status(400).send(`error - ${paymentResponse.error}`);
         }
         const statusPayment = paymentResponse.status;
         //* Status Approved
@@ -111,7 +108,6 @@ const ejecutarPago = async(req, res) => {
         else{
             let paymentErrorMessage = `Mensaje de error no controlado: ${statusPayment}`
             if (statusPayment === "rejected") {
-                //? salto de linea
                 paymentErrorMessage =  `Pago rechazado (${statusPayment}). Detalle del error:
                 Tipo: ${paymentResponse.status_details.error.type}
                 Id: ${paymentResponse.status_details.error.reason.id}

@@ -55,13 +55,10 @@ const postPagoDecidir = async(paymentRequest, movim, amount, cuotas, siteId, nro
 
     } catch (error) {
         console.log('error decidir aqui:', error.response.data);
-        //? ya se realizo el pago en decidir //? cambiar esto
-        if (error.response.data.hasOwnProperty('validation_errors')) {
-            if (error.response.data.validation_errors[0].hasOwnProperty('code')) {
-                const code = error.response.data.validation_errors[0].code;
-                console.log(code);
-                return code == 'repeated' ? { error: 'Ya se realizo un pago con este id_transaction' } : { error: error.response.data };
-            }
+        //? "error_type": "invalid_request_error"
+        if (error.response.data.error_type == 'invalid_request_error') {
+            let error = `${error.response.data.validation_errors.code} - ${error.response.data.validation_errors.param}`;
+            return { error, decidirError: error.response.data }
         }          
         return error.response.data;
     }
