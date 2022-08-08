@@ -14,7 +14,19 @@ const getCuotaByID = async(idCuota) => {
         return null;
     }
 }
+const allCuota = async() => {
+    try {
+        let q = `SELECT * FROM TBL_DEC_CUOTAS WHERE HABILITADO = 1`;
+        const result = await consulta(q);
+        if (result.length == 0) return null;
+        return result;
+
+    } catch (error) {
+        console.log(error);
+        return null;
+    }
+}
 
 module.exports = {
-    getCuotaByID
+    getCuotaByID, allCuota
 }

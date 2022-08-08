@@ -54,7 +54,7 @@ const postPagoDecidir = async(paymentRequest, movim, amount, cuotas, siteId, nro
         return await pago.data;
 
     } catch (error) {
-        console.log(error.response.data);
+        console.log('error decidir aqui:', error.response.data);
         //? ya se realizo el pago en decidir //? cambiar esto
         if (error.response.data.hasOwnProperty('validation_errors')) {
             if (error.response.data.validation_errors[0].hasOwnProperty('code')) {
@@ -63,7 +63,7 @@ const postPagoDecidir = async(paymentRequest, movim, amount, cuotas, siteId, nro
                 return code == 'repeated' ? { error: 'Ya se realizo un pago con este id_transaction' } : { error: error.response.data };
             }
         }          
-        return null;
+        return error.response.data;
     }
 }
 const obtenerUnPago = async(idDecidir) => {
@@ -85,6 +85,34 @@ const obtenerUnPago = async(idDecidir) => {
         console.log(error.response.data);
         return null;
     }
+}
+const devolucionDecidir = async(idDecidir) => {
+    if (idDecidir == null || idDecidir.length == 0) return null
+    try {
+        const devPago = await axios.post(`${decidirUrl}payments/${idDecidir}/refunds`, {},
+        {
+            headers: {
+                'Content-Type': 'application/json',
+                'apikey': decidirPrivateKey,
+                'cache-control': 'no-cache',
+            }
+        })
+        //* 1 - si devPago.data.status == 'approved', actualizar la tabla gedDecidirLog con estado 'anulled' donde NRO_OPERACION = idDecidir
+        if (devPago.data.status == 'approved') {
+            const q = `UPDATE GES_DECIDIR_LOG SET STATUS = 'anulled' WHERE NRO_OPERACION = ${idDecidir} AND STATUS = 'approved'`;
+            await consulta(q);
+            return await devPago.data;  
+        }
+        else{
+            console.log('error devolucion decidir:', devPago.data);
+            return null
+        }
+
+    } catch (error) {
+        console.log(error);
+        return null;
+    }
+
 }
 const insertGesDecidir = async(args) => {
 
@@ -123,14 +151,14 @@ const insertGesDecidirLog = async(args) => {
         '${args.ticket}',
         '${args.nroTransacParte}')`;
 
-    const result = await consulta(q);
+    await consulta(q);
     //* 2 consultar ges decidir log si se inserto correctamente
     let q2 = `SELECT * FROM GES_DECIDIR_LOG WHERE ID = '${args.gesDecidirLogId}'`;
     const result2 = await consulta(q2);
     return result2;
 }
 
-module.exports = { getPagoDecidir, postPagoDecidir, insertGesDecidir, obtenerUnPago, insertGesDecidirLog};
+module.exports = { getPagoDecidir, postPagoDecidir, insertGesDecidir, obtenerUnPago, insertGesDecidirLog, devolucionDecidir};
 //? traer promociones de tarjeta
 // SELECT * FROM TBL_DEC_MEDIO_PAGO_ENT_FINANC
 // JOIN TBL_MEDIO_PAGO_PROMOCION ON TBL_DEC_MEDIO_PAGO_ENT_FINANC.MPAGO_ENT_FINANC_ID = TBL_MEDIO_PAGO_PROMOCION.MPAGO_ENT_FINANC_ID

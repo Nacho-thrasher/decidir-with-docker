@@ -1,4 +1,3 @@
-const { consulta } = require("../index");
 const { getMontoGesDecidirLog, getByNroTran } = require("../services/movimiento");
 //* servicio de boleta
 const getBoletaById = async (nroTran) => {

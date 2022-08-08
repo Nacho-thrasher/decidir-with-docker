@@ -1,6 +1,5 @@
 const { getPagoDecidir, postPagoDecidir, obtenerUnPago } = require('../services/decidir');
-const { getAmount, parseAmountToLong, getAllAmounts } = require('../helpers/amount');
-const { calcularMontoConInteres, calcularMontoPorCuota } = require('../helpers/cuota');
+const { getAmount, getAllAmounts } = require('../helpers/amount');
 const { insertLog } = require('../helpers/logDecidir');
 const { getDescription, getMontoGesDecidirLog, getGesDecidirLog } = require('../services/movimiento');
 const { addGesDecidir } = require('../helpers/gesDecidir');
@@ -66,13 +65,15 @@ const ejecutarPago = async(req, res) => {
         req.decidirLog.montoPorCuota = montoPorCuota;
         //* Creo el pago en decidir
         const paymentResponse = await postPagoDecidir(PaymentRequestDto, movim, longAmount, cuota.CANTIDAD, medioPago.SITE_ID, nroTransacParte);       
+        // devolver payment data correctamente y si estado no es ni rejected ni approved entra aqui
         if (!paymentResponse || paymentResponse == null || paymentResponse.error != null) {
+            console.log(`linea 69: `,paymentResponse);
             const error = 'Falló el proceso ejecutarPago (Decidir).'
             req.decidirLog.error = error;
             req.decidirLog.status = 'ERROR_EJECUTAR_PAGO_API_DECIDIR';
             await insertLog(req.decidirLog);
             return res.status(400).json({
-                message: error,
+                message: `error - ${paymentResponse.error}`,
                 type: paymentResponse.error
             });
         }
@@ -111,29 +112,39 @@ const ejecutarPago = async(req, res) => {
             let paymentErrorMessage = `Mensaje de error no controlado: ${statusPayment}`
             if (statusPayment === "rejected") {
                 //? salto de linea
-                paymentErrorMessage =  `Pago rechazado (${statusPayment}). Detalle del error: \n
-                Tipo: ${paymentResponse.status_details.error.type} \n
-                Id: ${paymentResponse.status_details.error.reason.id} \n
-                Descripción: ${paymentResponse.status_details.error.reason.description} \n
-                Descripción adicional: ${paymentResponse.status_details.error.reason.additional_description} \n
-                Ticket: ${paymentResponse.status_details.ticket} \n
-                Codigo de autorización de la tarjeta: ${paymentResponse.status_details.card_authorization_code} \n
-                Código de validación de dirección: ${paymentResponse.status_details.address_validation_code} \n
+                paymentErrorMessage =  `Pago rechazado (${statusPayment}). Detalle del error:
+                Tipo: ${paymentResponse.status_details.error.type}
+                Id: ${paymentResponse.status_details.error.reason.id}
+                Descripción: ${paymentResponse.status_details.error.reason.description}
+                Descripción adicional: ${paymentResponse.status_details.error.reason.additional_description}
+                Ticket: ${paymentResponse.status_details.ticket}
+                Codigo de autorización de la tarjeta: ${paymentResponse.status_details.card_authorization_code}
+                Código de validación de dirección: ${paymentResponse.status_details.address_validation_code}
                 `;
                 //? editar ges decidir log con el error, fecha de rechazo y status
-                //? Gson gson = new Gson(); similar a JSON.stringify(paymentResponse.status_details.error)
                 const jsonPaymentResponse = JSON.stringify(paymentResponse);
-                req.status = statusPayment;
-                req.error = jsonPaymentResponse != null ? jsonPaymentResponse : paymentErrorMessage;
+                req.decidirLog.status = statusPayment;
+                req.decidirLog.error = paymentErrorMessage;
+                req.decidirLog.nroOperacion = paymentResponse.id;
+                req.decidirLog.montoAPagar = floatAmount;
+                req.decidirLog.descripcion = await getDescription(movim); 
+                req.decidirLog.tipoOperacion = tipoOperacion;
+                req.decidirLog.ticket = paymentResponse.status_details.ticket;
+                req.decidirLog.nroTransacParte = nroTransacParte;
+                console.log('error log: ', req.decidirLog);
                 await insertLog(req.decidirLog);
-
-                return res.status(400).send(paymentErrorMessage);
+                //? Se rechazo el pago por (monto), (tipo de error), con tarjeta (card_brand)
+                const errorMsg = `Pago rechazado (${statusPayment}).\n
+                * Se rechazo el pago por (${ montoFloat == null ? floatAmount : montoFloat }$)\n
+                * ${paymentResponse.status_details.error.reason.description}\n
+                `;
+                return res.status(400).send(errorMsg);
             }
         }  
     } 
     catch (error) {
         console.log(error);
-        res.status(500).send(`Ocurrió un error ejecutando pago: ${error}`);
+        res.status(400).send(`Ocurrió un error ejecutando pago: ${error}`);
     }
 }
 

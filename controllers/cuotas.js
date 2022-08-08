@@ -12,9 +12,7 @@ const getById = async(req, res) => {
         const cuota = await getCuotaByID(id);
         if (!cuota || cuota == undefined) {
             const error = 'No existe la cuota correspondiente al ID ingresado.'
-            return res.status(404).json({
-                message: error
-            });
+            return res.status(400).json(error);
         }    
         return res.json({
             cuotaId: cuota.CUOTA_ID,

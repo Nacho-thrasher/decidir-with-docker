@@ -53,6 +53,7 @@ const getDescription = async (movim) => {
 
   return descripcion;
 };
+
 const getGesDecidirLog = async (nroTran) => {
   try {
     let q = `SELECT * FROM GES_DECIDIR_LOG WHERE NRO_TRANSAC = ${nroTran} AND STATUS = 'approved'`;
@@ -65,6 +66,7 @@ const getGesDecidirLog = async (nroTran) => {
     return 'error';
   }
 }
+
 const getMontoGesDecidirLog = async (nroTran) => {
   try {
 
@@ -78,10 +80,11 @@ const getMontoGesDecidirLog = async (nroTran) => {
     return 'error';
   }
 }
+
 const countMovimsGesDecidirLog = async (nroTran) => {
   try {
     
-    let q = `SELECT COUNT(*) FROM GES_DECIDIR_LOG WHERE NRO_TRANSAC = ${nroTran} AND STATUS = 'approved'`;
+    let q = `SELECT COUNT(*) FROM GES_DECIDIR_LOG WHERE NRO_TRANSAC = ${nroTran} AND STATUS = 'approved' OR  STATUS = 'anulled'`;
     const result = await consulta(q);
     if (result == null || result.length == 0) return null;
     return result[0]['COUNT(*)'];
