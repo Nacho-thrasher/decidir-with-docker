@@ -1,4 +1,6 @@
-const { consulta } = require('../index');
+// const { consulta } = require('../index');
+const { consulta } = require('../vendor/transaction');
+
 
 const getAllProveedorPago = async(nroTran) => {
     try {

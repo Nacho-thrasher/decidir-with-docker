@@ -1,19 +1,21 @@
-const { consulta } = require("../index");
+// const { consulta } = require("../index");
+const { consulta } = require('../vendor/transaction');
+
 const {
-  getMarcaReinscripcionFicha,
-  devolverMaestro,
-} = require("../services/gesMovimsCodBarra2");
+        getMarcaReinscripcionFicha,
+        devolverMaestro,
+      } = require("../services/gesMovimsCodBarra2");
 
 const getByNroTran = async (nroTran) => {
   try {
-    //? tmb consultar a ges-decidir para ver si el movimiento existe
     let q = `SELECT * FROM GES_MOVIMS_COD_BARRA2 WHERE NRO_TRANSAC = ${nroTran}`;
     const result = await consulta(q);
+    console.log(`entroooo`,result);
     if (result == null || result.length == 0) return null;
-    return result[0];
-    
-  } catch (error) {
-    console.log(error);
+    return result[0];  
+  } 
+  catch (error) {
+    console.log('\x1b[31m%s\x1b[0m', error);
     return null;
   }
 };
@@ -46,7 +48,6 @@ const getDescription = async (movim) => {
       }
     }
   }
-  console.log("modalidad: ", modalidad);
   //? Descripcion del movimiento:
   let descripcion = `PAGO SAG - ${modalidad} - ${movim.LUGAR} - ${movim.SECTOR} - ${movim.CARRERA} - ${movim.MODO}
     - ${movim.TDOCU} - ${movim.NDOCU} - ${movim.NRO_COMP1} - ${movim.NRO_COMP2}`;
@@ -83,12 +84,10 @@ const getMontoGesDecidirLog = async (nroTran) => {
 
 const countMovimsGesDecidirLog = async (nroTran) => {
   try {
-    
     let q = `SELECT COUNT(*) FROM GES_DECIDIR_LOG WHERE NRO_TRANSAC = ${nroTran} AND STATUS = 'approved' OR  STATUS = 'anulled'`;
     const result = await consulta(q);
     if (result == null || result.length == 0) return null;
     return result[0]['COUNT(*)'];
-
   } 
   catch (error) {
     console.log(error);

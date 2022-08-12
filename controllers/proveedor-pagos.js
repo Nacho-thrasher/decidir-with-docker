@@ -103,9 +103,7 @@ const getById = async(req, res) => {
     } 
     catch (error) {
         console.log(error);
-        res.status(500).send(
-            `Ocurrió un error obteniendo pagos: ${error}`
-        )   
+        res.status(500).send(`Ocurrió un error obteniendo pagos: ${error}`)   
     }
 }
 

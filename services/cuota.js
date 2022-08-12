@@ -1,4 +1,6 @@
-const { consulta } = require('../index');
+// const { consulta } = require('../index');
+const { consulta } = require('../vendor/transaction');
+
 
 const getCuotaByID = async(idCuota) => {
     try {
@@ -20,8 +22,8 @@ const allCuota = async() => {
         const result = await consulta(q);
         if (result.length == 0) return null;
         return result;
-
-    } catch (error) {
+    } 
+    catch (error) {
         console.log(error);
         return null;
     }

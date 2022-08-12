@@ -9,7 +9,6 @@ const estadoPago = async(req, res) => {
     try { 
         const getPago = await getPagoDecidir(nroTran);
         if (!getPago || getPago.length === 0) {
-            // const error = 'No se encontraron pagos para el número de transacción ingresado.'
             return res.json({
                 token: null,
                 date: null,
@@ -80,10 +79,11 @@ const ejecutarPago = async(req, res) => {
             req.decidirLog.status = statusPayment;
             req.decidirLog.nroOperacion = paymentResponse.id;
             req.decidirLog.montoAPagar = floatAmount;
-            req.decidirLog.descripcion = await getDescription(movim); 
+            // req.decidirLog.descripcion = await getDescription(movim); 
             req.decidirLog.tipoOperacion = tipoOperacion;
             req.decidirLog.ticket = paymentResponse.status_details.ticket;
             req.decidirLog.nroTransacParte = nroTransacParte; 
+            req.decidirLog.descuento = 0;
             await insertLog(req.decidirLog);
             //* payment response
             console.log(`status: ${statusPayment}`);
@@ -93,7 +93,7 @@ const ejecutarPago = async(req, res) => {
             const pagoCompleto = montoPagado == montoAPagar.MONTO_A_APGAR ? true : false;
             //* insert en gesDecidir
             if (pagoCompleto) {
-                await addGesDecidir(montoPagado, movim, cuota, appOrigen, tipoOperacion);
+                await addGesDecidir(montoPagado, movim, cuota, appOrigen, tipoOperacion, req.decidirLog.descuento);
             }
             //* return response
             return res.status(200).json({
@@ -123,10 +123,11 @@ const ejecutarPago = async(req, res) => {
                 req.decidirLog.error = paymentErrorMessage;
                 req.decidirLog.nroOperacion = paymentResponse.id;
                 req.decidirLog.montoAPagar = floatAmount;
-                req.decidirLog.descripcion = await getDescription(movim); 
+                // req.decidirLog.descripcion = await getDescription(movim); 
                 req.decidirLog.tipoOperacion = tipoOperacion;
                 req.decidirLog.ticket = paymentResponse.status_details.ticket;
                 req.decidirLog.nroTransacParte = nroTransacParte;
+                req.decidirLog.descuento = 0;
                 console.log('error log: ', req.decidirLog);
                 await insertLog(req.decidirLog);
                 //? Se rechazo el pago por (monto), (tipo de error), con tarjeta (card_brand)

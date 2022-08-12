@@ -1,4 +1,5 @@
-const { consulta } = require('../index');
+const { consulta } = require('../vendor/transaction');
+// const { consulta } = require('../index');
 
 const allEntidadesFinancieras = async() => {
     try {

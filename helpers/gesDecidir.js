@@ -3,7 +3,7 @@ const { calcularMontoConInteres, calcularMontoPorCuota } = require('../helpers/c
 const { getDescription } = require('../services/movimiento');
 const { insertGesDecidir } = require('../services/decidir');
 
-const addGesDecidir = async(amount, movim, cuota, appOrigen, tipoOperacion) => {
+const addGesDecidir = async(amount, movim, cuota, appOrigen, tipoOperacion, descuento) => {
     
     if (amount == null ||  movim == null || cuota == null) return null    
     const descripcion = await getDescription(movim);
@@ -26,7 +26,8 @@ const addGesDecidir = async(amount, movim, cuota, appOrigen, tipoOperacion) => {
         montoConInteres: calcularMontoConInteres(amount, cuota.INTERES),
         // montoPorCuota: calcularMontoPorCuota(amount, cuota.CANTIDAD, cuota.INTERES),
         appOrigen: appOrigen == null || appOrigen.length == 0 ? 'SAG_BACKEND' : appOrigen,
-        tipoOperacion: tipoOperacion
+        tipoOperacion: tipoOperacion,
+        descuento: descuento,
     }
     //? insert en ges decidir
     const gesDecidir = await insertGesDecidir(args);

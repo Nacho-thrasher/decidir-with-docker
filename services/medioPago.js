@@ -1,4 +1,5 @@
-const { consulta } = require("../index");
+// const { consulta } = require("../index");
+const { consulta } = require('../vendor/transaction');
 
 const medioPagoById = async (medioPagoId) => {
   //? consultar id medio pago en tabla medio_pago

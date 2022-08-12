@@ -1,4 +1,5 @@
-const { consulta } = require('../index');
+// const { consulta } = require('../index');
+const { consulta } = require('../vendor/transaction');
 
 const getMarcaReinscripcionFicha = async(tdocu, ndocu, lugar, sector, carrera, modo) => {
     try {

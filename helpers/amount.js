@@ -19,8 +19,7 @@ const getAmount = (movim, monto, pendiente) => {
         else{
             floatAmount = movim.TOTAL2;
         }
-    } catch (error) {
-        //? Si fallo por algun motivo, por ejemplo que venian nulas las fechas de vencimiento toma el total 2 por default
+    } catch (error) {//? Si fallo por algun motivo, por ejemplo que venian nulas las fechas de vencimiento toma el total 2 por default
         floatAmount = movim.TOTAL2;
     }
     return floatAmount
@@ -38,13 +37,11 @@ const getAllAmounts = (montos, interes, cantidad) => {
     const monto = montos.monto ? montos.monto : montos.total;
     const longAmount = parseAmountToLong(monto);
     const montoConInteres = calcularMontoConInteres(monto, interes);
-    const montoPorCuota = calcularMontoPorCuota(monto, cantidad, interes);
-    
+    const montoPorCuota = calcularMontoPorCuota(monto, cantidad, interes);    
     return {
         longAmount: longAmount,
         montoConInteres: montoConInteres,
         montoPorCuota: montoPorCuota,
     }
 }
-
 module.exports = { getAmount, parseAmountToLong, getAllAmounts };

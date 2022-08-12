@@ -1,5 +1,6 @@
 const { devolucionDecidir } = require('../services/decidir');
-const { consulta } = require('../index');
+// const { consulta } = require('../index');
+const { consulta } = require('../vendor/transaction');
 
 const devolucionPago = async(req, res) => {
     const { nroTran } = req.query;

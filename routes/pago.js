@@ -2,8 +2,7 @@ const router = require("express").Router();
 const {
   estadoPago,
   ejecutarPago,
-  obtenerPago,
-  ejecutarPagoParte
+  obtenerPago
 } = require("../controllers/pago");
 const { validarMovims }     = require("../middlewares/validarMovims");
 const { validarMedioPago }  = require("../middlewares/validarMedioPago");

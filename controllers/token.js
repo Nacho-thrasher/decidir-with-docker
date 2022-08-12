@@ -17,10 +17,7 @@ const createToken = async (req, res) => {
     res.json(response.data);
   } catch (error) {
     console.log(error);
-    res.status(500).json({
-      message: "Error al crear el token",
-      error: error,
-    });
+    res.status(500).json(`Error al crear el token ${error}`);
   }
 };
 module.exports = {

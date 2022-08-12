@@ -39,6 +39,4 @@ const insertLog = async(args) => {
     return resp
 }
 
-
-
 module.exports = { addLog, insertLog };

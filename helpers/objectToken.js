@@ -10,8 +10,9 @@ const object = (obj) => {
             "type": obj.type,
             "number":   obj.number,        
         }
-    };
+    }
 }
 module.exports = {
     object
 }
+//==============================================================
