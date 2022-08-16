@@ -1,36 +1,9 @@
 // const require = require('express').Router();
 // const superTest = require('supertest');
 // const request = superTest('http://localhost:8880/v1');
-
-process.env.DB_USUARIO = 'APP_GESTION'
-process.env.DB_CLAVE = 'APP_GESTION'
-process.env.DB_URL_CONEXION = 'odevdb.ucasal.edu.ar:1521/oratest'
-process.env.DECIDIR_URL = 'https://developers.decidir.com/api/v2/'
-process.env.DECIDIR_PUBLIC_KEY = '96e7f0d36a0648fb9a8dcb50ac06d260'
-process.env.DECIDIR_PRIVATE_KEY = '1b19bb47507c4a259ca22c12f78e881f'
-process.env.APP_ENTORNO = 'testing'
 // process.env.APP_PUERTO = 8080
-
 // const { getBoletaById } = require('../services/boleta');
-
-//     // beforeAll(async () => {
-//     //     await conectarse();
-//     // })
-//     //? test para obtener boleta por id
-//     // it('should return a boleta', async () => {
-//     //     const boleta = await getBoletaById(12551797);
-//     //     console.log(boleta);
-//     //     //? expect true to be true
-//     // }).timeout(1000) //? timeout para que no se quede en espera infinita
-    
-//     //? test para obtener boleta por id con error
-//     // it('should return a boleta', async () => {
-//     //     const boleta = await getBoletaById(7192653);
-//     //     console.log(boleta);
-//     //     expect(boleta).toEqual(null);
-//     //     //? expect true to be tru
-//     // })
-// })
+//? test para obtener boleta por id con error
 const { getAmount, getAllAmounts} = require('../helpers/amount');
 const movim = {
     montoPendiente: 5000,
@@ -63,7 +36,6 @@ const supertest = require('supertest')
 console.clear()
 
 const { conectarse, consulta } = require('../vendor/transaction');
-
 // const { consulta } = jest.requireActual('../index');
 // const conectarse = (...args) => import('../index').then(({default: conectarse}) => conectarse(...args));
 // const consulta = (...args) => import('../index').then(({default: consulta}) => consulta(...args));
@@ -78,11 +50,12 @@ it('should return a connection', async () => {
 })  
 // ? boleta
 // jest.mock('../services/boleta');
-const { getBoletaById } = jest.requireActual('../services/boleta');	
+// const { getBoletaById } = jest.requireActual('../services/boleta');	
 // const { getByNroTran } = jest.requireActual('../services/movimiento');
 
-it('should return a boleta', async() => {
-    const boleta = await getBoletaById(43139385);
-    console.log('boleta',boleta);
-    expect(boleta).toEqual(null);
-})
+// it('should return a boleta', async() => {
+//     const boleta = await getBoletaById(43139385);
+//     console.log('boleta',boleta);
+//     expect(boleta).toEqual(null);
+// })
+//? no hacer mock de los encpoints para que no se quede en espera infinita
